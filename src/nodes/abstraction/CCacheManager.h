@@ -38,12 +38,15 @@ public:
 
 private:
     void do_processConfirmation (ControlPacket * pDataPacket);
+    void do_processBroadcast    (ControlPacket * pDataPacket);
     void do_processSelfMessages (omnetpp::cMessage * pSelfMessage);
 
     void do_processTimeout (FileId fileId);
-    void do_processRequest ();
+    void do_processRequest (FileId fileId);
 
-    void do_scheduleNextRequest ();
+    void do_prepareEnquiry ();
+
+    void do_scheduleNextEnquiry ();
     void do_scheduleTimeout (FileId fileId);
 
 private:

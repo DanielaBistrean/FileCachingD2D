@@ -185,8 +185,6 @@ EXECUTE_ON_STARTUP(
     e->insert(DP_FEEDBACK, "DP_FEEDBACK");
     e->insert(DP_REQ, "DP_REQ");
     e->insert(DP_EOF, "DP_EOF");
-    e->insert(DP_BROADCAST, "DP_BROADCAST");
-    e->insert(DP_CONFIRM, "DP_CONFIRM");
 )
 
 EXECUTE_ON_STARTUP(

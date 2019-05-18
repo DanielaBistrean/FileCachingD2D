@@ -32,7 +32,7 @@ CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink)
     }
 
     if (m_pNode->getNode ()->getId () == 2)
-        do_scheduleNextRequest ();
+        do_scheduleNextEnquiry ();
 }
 
 bool
@@ -75,12 +75,21 @@ CCacheManager::process (omnetpp::cMessage * pMsg)
 
     switch (pControlPacket->getType())
     {
-    case DP_CONFIRM:
+    case CP_CONFIRM:
         do_processConfirmation (pControlPacket);
+        break;
+    case CP_BROADCAST:
+        do_processBroadcast (pControlPacket);
         break;
     default:
         break;
     }
+}
+
+void
+CCacheManager::do_processBroadcast (ControlPacket * pDataPacket)
+{
+
 }
 
 void
@@ -100,8 +109,8 @@ CCacheManager::do_processSelfMessages (omnetpp::cMessage * pSelfMessage)
 
     switch (pNotification->getType ())
     {
-    case N_REQUEST:
-        do_processRequest ();
+    case N_SCHEDULE:
+        do_prepareEnquiry ();
         break;
     case N_TIMEOUT:
         do_processTimeout (fileId);
@@ -141,11 +150,11 @@ CCacheManager::do_processTimeout (FileId fileId)
 }
 
 void
-CCacheManager::do_processRequest ()
+CCacheManager::do_prepareEnquiry ()
 {
     if (m_bDownloading)
     {
-        do_scheduleNextRequest ();
+        do_scheduleNextEnquiry ();
         return;
     }
 
@@ -167,7 +176,7 @@ CCacheManager::do_processRequest ()
     ControlPacket * pResponse = new ControlPacket ();
     pResponse->setSourceId (m_pNode->getNode ()->getId ());
     pResponse->setDestinationId (-1);
-    pResponse->setType (DP_BROADCAST);
+    pResponse->setType (CP_BROADCAST);
 
     BroadcastControlPacket * pBroadcast = new BroadcastControlPacket ();
     pBroadcast->setFileId (fileId);
@@ -178,14 +187,14 @@ CCacheManager::do_processRequest ()
     m_pNode->sendBroadcast(pResponse);
 
     do_scheduleTimeout (fileId);
-    do_scheduleNextRequest ();
+    do_scheduleNextEnquiry ();
 }
 
 void
-CCacheManager::do_scheduleNextRequest ()
+CCacheManager::do_scheduleNextEnquiry ()
 {
     UENotification * pNotification = new UENotification ();
-    pNotification->setType (N_REQUEST);
+    pNotification->setType (N_SCHEDULE);
 
     // TODO: make it random
     m_pNode->sendInternal (pNotification, 10);

@@ -180,7 +180,7 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
 EXECUTE_ON_STARTUP(
     omnetpp::cEnum *e = omnetpp::cEnum::find("NotificationType");
     if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("NotificationType"));
-    e->insert(N_REQUEST, "N_REQUEST");
+    e->insert(N_SCHEDULE, "N_SCHEDULE");
     e->insert(N_TIMEOUT, "N_TIMEOUT");
 )
 

@@ -31,7 +31,7 @@ network BasicNetwork
         double velocityMax = default(5);
 
         double updateInterval = default(1000); //1000ms
-        double D2DMaxRange = default(1000);
+        double D2DMaxRange = default(200);
         
         double D2DEnquiryTimeout = default (0.5);
 

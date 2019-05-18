@@ -21,8 +21,6 @@ enum DataPacketType
     DP_FEEDBACK = 1;
     DP_REQ = 2;
     DP_EOF = 3;
-    DP_BROADCAST = 4;
-    DP_CONFIRM = 5;
 };
 
 enum ErrorType

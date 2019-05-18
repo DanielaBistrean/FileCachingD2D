@@ -15,7 +15,7 @@
 
 enum NotificationType
 {
-    N_REQUEST = 0;
+    N_SCHEDULE = 0;
     N_TIMEOUT = 1;
 }
 
