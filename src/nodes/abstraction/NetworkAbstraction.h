@@ -37,8 +37,13 @@ public:
     void deregisterBase ();
 
 public:
-    cGate * getUserGate (int userId);
+    cGate * getNodeGate (int nodeId);
     cGate * getBaseGate ();
+
+    int     getBaseId ();
+
+public:
+    std::vector <cGate *> getBroadcastGates (int senderId);
 
 private:
     NetworkAbstraction () : m_base {nullptr} {};

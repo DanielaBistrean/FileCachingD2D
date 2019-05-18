@@ -22,11 +22,20 @@ Define_Module(gNB);
 void gNB::initialize()
 {
     NetworkAbstraction::getInstance ().registerBase (this);
+
+    m_pFileSource = std::unique_ptr <CFileSource> (new CFileSource (this, &m_cache));
 }
 
 void gNB::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    m_pFileSource->process (msg);
+
+    delete msg;
+}
+
+omnetpp::cSimpleModule* gNB::getNode ()
+{
+    return this;
 }
 
 void gNB::finish()

@@ -20,10 +20,13 @@
 
 #include <memory>
 
-#include "../../messages/DataPacket_m.h"
-#include "../../transfer/CFileCache.h"
+#include "../messages/DataPacket_m.h"
+#include "../transfer/CFileCache.h"
 
 #include "../abstraction/INode.h"
+#include "../abstraction/CFileSink.h"
+#include "../abstraction/CFileSource.h"
+#include "../abstraction/CCacheManager.h"
 
 #include "CMobility.h"
 
@@ -32,10 +35,11 @@ using namespace omnetpp;
 class UE : public cSimpleModule, public INode
 {
 public:
-    virtual void sendInternal   (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset) override;
-    virtual void sendOut (omnetpp::cMessage * pMsg, int nodeId) override;
+    virtual omnetpp::cSimpleModule* getNode () override;
 
-    virtual omnetpp::cDisplayString& getDisplay () override;
+public:
+    double getX () { return m_pMobility->getX (); };
+    double getY () { return m_pMobility->getY (); };
 
 protected:
     virtual void initialize();
@@ -45,7 +49,10 @@ protected:
 private:
     CFileCache m_cache;
 
-    std::unique_ptr <CMobility> m_pMobility;
+    std::unique_ptr <CMobility>     m_pMobility;
+    std::unique_ptr <CFileSink>     m_pFileSink;
+    std::unique_ptr <CFileSource>   m_pFileSource;
+    std::unique_ptr <CCacheManager> m_pCacheManager;
 };
 
 #endif

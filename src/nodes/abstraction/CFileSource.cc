@@ -8,7 +8,10 @@ CFileSource::CFileSource (INode * pNode, CFileCache * pCache)
 void
 CFileSource::process (omnetpp::cMessage * pMsg)
 {
-    DataPacket *pDataPacket = omnetpp::check_and_cast <DataPacket *> (pMsg);
+    DataPacket *pDataPacket = dynamic_cast <DataPacket *> (pMsg);
+
+    if (! pDataPacket)
+        return;
 
     switch (pDataPacket->getType())
     {
@@ -26,24 +29,37 @@ CFileSource::process (omnetpp::cMessage * pMsg)
 void
 CFileSource::do_processRequest (DataPacket * pDataPacket)
 {
+    EV_STATICCONTEXT
+
     auto sId = pDataPacket->getSourceId ();
     auto dId = pDataPacket->getDestinationId ();
 
+    EV_WARN << "Processing data packet from node " << sId << std::endl;
+
     omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
     if (! pPacket)
+    {
+        EV_WARN << "Could not decapsulate packet" << std::endl;
         return;
+    }
 
     RequestDataPacket * pRequest = dynamic_cast <RequestDataPacket *> (pPacket);
 
     if (! pRequest)
+    {
+        EV_WARN << "Not a request packet. Something bad happened" << std::endl;
         return;
+    }
 
     int fileId = pRequest->getFileId ();
     int startBlockId = pRequest->getStartBlockId ();
 
     auto it = m_pCache->find (fileId);
     if (it == m_pCache->end ())
+    {
+        EV_WARN << "No file found with id " << fileId << std::endl;
         return;
+    }
 
     CFile file = it->second;
     if (! file.hasBlock (startBlockId))

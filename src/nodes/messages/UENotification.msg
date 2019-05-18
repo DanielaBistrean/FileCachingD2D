@@ -13,38 +13,14 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __FILECACHINGD2D_GNB_H_
-#define __FILECACHINGD2D_GNB_H_
-
-#include <memory>
-#include <omnetpp.h>
-
-#include "../abstraction/INode.h"
-#include "../abstraction/CFileSource.h"
-#include "../transfer/CFileCache.h"
-
-using namespace omnetpp;
-
-/**
- * TODO - Generated class
- */
-class gNB : public cSimpleModule, public INode
+enum NotificationType
 {
-public:
-    gNB () : m_cache (true) {};
+    N_REQUEST = 0;
+    N_TIMEOUT = 1;
+}
 
-public:
-    virtual omnetpp::cSimpleModule* getNode () override;
-
-protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-    virtual void finish();
-
-private:
-    CFileCache m_cache;
-
-    std::unique_ptr <CFileSource> m_pFileSource;
-};
-
-#endif
+message UENotification
+{
+    int fileId;
+	int type @enum(NotificationType);
+}

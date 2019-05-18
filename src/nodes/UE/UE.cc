@@ -23,12 +23,27 @@ void UE::initialize()
 {
     NetworkAbstraction::getInstance ().registerUser (this);
 
-    m_pMobility = std::unique_ptr <CMobility> (new CMobility (this));
+    m_pMobility     = std::unique_ptr <CMobility>     (new CMobility     (this));
+    m_pFileSink     = std::unique_ptr <CFileSink>     (new CFileSink     (this, &m_cache));
+    m_pFileSource   = std::unique_ptr <CFileSource>   (new CFileSource   (this, &m_cache));
+    m_pCacheManager = std::unique_ptr <CCacheManager> (new CCacheManager (this, m_pFileSink.get ()));
+
+    if (getId () == 8)
+    {
+        m_cache = CFileCache (true);
+    }
+
+    scheduleAt(simTime() + 1, new cMessage("test"));
 }
 
 void UE::handleMessage(cMessage *msg)
 {
-    m_pMobility->process (msg);
+    m_pMobility->process     (msg);
+    m_pFileSink->process     (msg);
+    m_pFileSource->process   (msg);
+    m_pCacheManager->process (msg);
+
+    delete msg;
 }
 
 void UE::finish()
@@ -36,27 +51,7 @@ void UE::finish()
     NetworkAbstraction::getInstance ().deregisterUser (this);
 }
 
-void UE::sendInternal (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset)
+omnetpp::cSimpleModule * UE::getNode ()
 {
-    scheduleAt (simTime () + offset, pMsg);
-}
-
-void UE::sendOut (omnetpp::cMessage * pMsg, int nodeId)
-{
-    cGate * out = nullptr;
-
-    if (nodeId == -1)
-        out = NetworkAbstraction::getInstance ().getBaseGate ();
-    else
-        out = NetworkAbstraction::getInstance ().getUserGate (nodeId);
-
-    if (! out)
-        return;
-
-    sendDirect(pMsg, out);
-}
-
-omnetpp::cDisplayString& UE::getDisplay ()
-{
-    return getDisplayString();
+    return this;
 }

@@ -15,6 +15,8 @@
 
 #include "NetworkAbstraction.h"
 
+#include "../../configuration/CGlobalConfiguration.h"
+
 NetworkAbstraction&
 NetworkAbstraction::getInstance ()
 {
@@ -53,13 +55,16 @@ NetworkAbstraction::deregisterBase ()
 }
 
 cGate *
-NetworkAbstraction::getUserGate (int userId)
+NetworkAbstraction::getNodeGate (int nodeId)
 {
-    auto user = m_users.find (userId);
-    if (user == m_users.end ())
-        return nullptr;
+    auto user = m_users.find (nodeId);
+    if (user != m_users.end ())
+        return user->second->gate ("radioIn$i");
 
-    return user->second->gate ("radioIn");
+    if (m_base && m_base->getId () == nodeId)
+        return m_base->gate ("radioIn$i");
+
+    return nullptr;
 }
 
 cGate *
@@ -68,5 +73,42 @@ NetworkAbstraction::getBaseGate ()
     if (! m_base)
         return nullptr;
 
-    return m_base->gate ("radioIn");
+    return m_base->gate ("radioIn$i");
+}
+
+int
+NetworkAbstraction::getBaseId ()
+{
+    if (! m_base)
+        return -1;
+
+    return m_base->getId ();
+}
+
+std::vector <cGate *>
+NetworkAbstraction::getBroadcastGates (int senderId)
+{
+    auto it = m_users.find (senderId);
+    if (it == m_users.end ())
+        return {};
+
+    UE * senderNode = it->second;
+
+    std::vector <cGate *> out;
+
+    static double maxRange = CGlobalConfiguration::getInstance ().get ("D2DMaxRange");
+
+    for (auto & user : m_users)
+    {
+        if (user.first == senderId)
+            continue;
+
+        UE * destNode = user.second;
+
+        double dist = sqrt((destNode->getX() - senderNode->getX()) * (destNode->getX() - senderNode->getX()) + (destNode->getY() - senderNode->getY()) * (destNode->getY() - senderNode->getY()));
+        if (dist < maxRange)
+            out.push_back (destNode->gate ("radioIn$i"));
+    }
+
+    return out;
 }

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.3 from messages/DataPacket.msg.
+// Generated file, do not edit! Created by nedtool 5.3 from nodes/messages/DataPacket.msg.
 //
 
 #if defined(__clang__)
@@ -19,7 +19,7 @@
 
 
 /**
- * Enum generated from <tt>messages/DataPacket.msg:18</tt> by nedtool.
+ * Enum generated from <tt>nodes/messages/DataPacket.msg:18</tt> by nedtool.
  * <pre>
  * enum DataPacketType
  * {
@@ -28,7 +28,7 @@
  *     DP_FEEDBACK = 1;
  *     DP_REQ = 2;
  *     DP_EOF = 3;
- *     DP_QUERY = 4;
+ *     DP_BROADCAST = 4;
  *     DP_CONFIRM = 5;
  * }
  * </pre>
@@ -39,12 +39,12 @@ enum DataPacketType {
     DP_FEEDBACK = 1,
     DP_REQ = 2,
     DP_EOF = 3,
-    DP_QUERY = 4,
+    DP_BROADCAST = 4,
     DP_CONFIRM = 5
 };
 
 /**
- * Enum generated from <tt>messages/DataPacket.msg:29</tt> by nedtool.
+ * Enum generated from <tt>nodes/messages/DataPacket.msg:29</tt> by nedtool.
  * <pre>
  * enum ErrorType
  * {
@@ -61,7 +61,7 @@ enum ErrorType {
 };
 
 /**
- * Class generated from <tt>messages/DataPacket.msg:36</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/DataPacket.msg:36</tt> by nedtool.
  * <pre>
  * packet ErrorDataPacket
  * {
@@ -103,7 +103,7 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const ErrorDataPacket& obj)
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, ErrorDataPacket& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>messages/DataPacket.msg:42</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/DataPacket.msg:42</tt> by nedtool.
  * <pre>
  * packet FileDataPacket
  * {
@@ -145,7 +145,7 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const FileDataPacket& obj) 
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, FileDataPacket& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>messages/DataPacket.msg:48</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/DataPacket.msg:48</tt> by nedtool.
  * <pre>
  * packet RequestDataPacket
  * {
@@ -187,7 +187,53 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const RequestDataPacket& ob
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, RequestDataPacket& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>messages/DataPacket.msg:54</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/DataPacket.msg:54</tt> by nedtool.
+ * <pre>
+ * packet ConfirmationDataPacket
+ * {
+ *     int fileId;
+ *     int numBlocks;
+ *     int startBlockId;
+ * }
+ * </pre>
+ */
+class ConfirmationDataPacket : public ::omnetpp::cPacket
+{
+  protected:
+    int fileId;
+    int numBlocks;
+    int startBlockId;
+
+  private:
+    void copy(const ConfirmationDataPacket& other);
+
+  protected:
+    // protected and unimplemented operator==(), to prevent accidental usage
+    bool operator==(const ConfirmationDataPacket&);
+
+  public:
+    ConfirmationDataPacket(const char *name=nullptr, short kind=0);
+    ConfirmationDataPacket(const ConfirmationDataPacket& other);
+    virtual ~ConfirmationDataPacket();
+    ConfirmationDataPacket& operator=(const ConfirmationDataPacket& other);
+    virtual ConfirmationDataPacket *dup() const override {return new ConfirmationDataPacket(*this);}
+    virtual void parsimPack(omnetpp::cCommBuffer *b) const override;
+    virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
+
+    // field getter/setter methods
+    virtual int getFileId() const;
+    virtual void setFileId(int fileId);
+    virtual int getNumBlocks() const;
+    virtual void setNumBlocks(int numBlocks);
+    virtual int getStartBlockId() const;
+    virtual void setStartBlockId(int startBlockId);
+};
+
+inline void doParsimPacking(omnetpp::cCommBuffer *b, const ConfirmationDataPacket& obj) {obj.parsimPack(b);}
+inline void doParsimUnpacking(omnetpp::cCommBuffer *b, ConfirmationDataPacket& obj) {obj.parsimUnpack(b);}
+
+/**
+ * Class generated from <tt>nodes/messages/DataPacket.msg:61</tt> by nedtool.
  * <pre>
  * packet FeedbackDataPacket
  * {
@@ -237,7 +283,7 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const FeedbackDataPacket& o
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, FeedbackDataPacket& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>messages/DataPacket.msg:62</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/DataPacket.msg:69</tt> by nedtool.
  * <pre>
  * packet EOFDataPacket
  * {
@@ -275,7 +321,7 @@ inline void doParsimPacking(omnetpp::cCommBuffer *b, const EOFDataPacket& obj) {
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, EOFDataPacket& obj) {obj.parsimUnpack(b);}
 
 /**
- * Class generated from <tt>messages/DataPacket.msg:67</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/DataPacket.msg:74</tt> by nedtool.
  * <pre>
  * packet DataPacket
  * {

@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.3 from messages/PositionUpdate.msg.
+// Generated file, do not edit! Created by nedtool 5.3 from nodes/messages/PositionUpdate.msg.
 //
 
 #if defined(__clang__)
@@ -19,7 +19,7 @@
 
 
 /**
- * Class generated from <tt>messages/PositionUpdate.msg:17</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/PositionUpdate.msg:17</tt> by nedtool.
  * <pre>
  * message PositionUpdate
  * {

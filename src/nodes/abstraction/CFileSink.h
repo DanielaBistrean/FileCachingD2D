@@ -1,8 +1,8 @@
 #ifndef D2D_CFILESINK_H
 #define D2D_CFILESINK_H 1
 
-#include "../../transfer/CFileCache.h"
-#include "../../messages/DataPacket_m.h"
+#include "../transfer/CFileCache.h"
+#include "../messages/DataPacket_m.h"
 
 #include "INode.h"
 #include "IProcessor.h"
@@ -16,6 +16,9 @@ public:
 
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
+
+public:
+    void requestFile (FileId fileId, int nodeId = -1);
 
 private:
     void do_processData  (DataPacket * pDataPacket);

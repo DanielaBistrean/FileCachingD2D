@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.3 from messages/PositionUpdate.msg.
+// Generated file, do not edit! Created by nedtool 5.3 from nodes/messages/UENotification.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "PositionUpdate_m.h"
+#include "UENotification_m.h"
 
 namespace omnetpp {
 
@@ -177,22 +177,31 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
     return out;
 }
 
-Register_Class(PositionUpdate)
+EXECUTE_ON_STARTUP(
+    omnetpp::cEnum *e = omnetpp::cEnum::find("NotificationType");
+    if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("NotificationType"));
+    e->insert(N_REQUEST, "N_REQUEST");
+    e->insert(N_TIMEOUT, "N_TIMEOUT");
+)
 
-PositionUpdate::PositionUpdate(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
+Register_Class(UENotification)
+
+UENotification::UENotification(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
 {
+    this->fileId = 0;
+    this->type = 0;
 }
 
-PositionUpdate::PositionUpdate(const PositionUpdate& other) : ::omnetpp::cMessage(other)
+UENotification::UENotification(const UENotification& other) : ::omnetpp::cMessage(other)
 {
     copy(other);
 }
 
-PositionUpdate::~PositionUpdate()
+UENotification::~UENotification()
 {
 }
 
-PositionUpdate& PositionUpdate::operator=(const PositionUpdate& other)
+UENotification& UENotification::operator=(const UENotification& other)
 {
     if (this==&other) return *this;
     ::omnetpp::cMessage::operator=(other);
@@ -200,27 +209,53 @@ PositionUpdate& PositionUpdate::operator=(const PositionUpdate& other)
     return *this;
 }
 
-void PositionUpdate::copy(const PositionUpdate& other)
+void UENotification::copy(const UENotification& other)
 {
+    this->fileId = other.fileId;
+    this->type = other.type;
 }
 
-void PositionUpdate::parsimPack(omnetpp::cCommBuffer *b) const
+void UENotification::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cMessage::parsimPack(b);
+    doParsimPacking(b,this->fileId);
+    doParsimPacking(b,this->type);
 }
 
-void PositionUpdate::parsimUnpack(omnetpp::cCommBuffer *b)
+void UENotification::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cMessage::parsimUnpack(b);
+    doParsimUnpacking(b,this->fileId);
+    doParsimUnpacking(b,this->type);
 }
 
-class PositionUpdateDescriptor : public omnetpp::cClassDescriptor
+int UENotification::getFileId() const
+{
+    return this->fileId;
+}
+
+void UENotification::setFileId(int fileId)
+{
+    this->fileId = fileId;
+}
+
+int UENotification::getType() const
+{
+    return this->type;
+}
+
+void UENotification::setType(int type)
+{
+    this->type = type;
+}
+
+class UENotificationDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
   public:
-    PositionUpdateDescriptor();
-    virtual ~PositionUpdateDescriptor();
+    UENotificationDescriptor();
+    virtual ~UENotificationDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -242,24 +277,24 @@ class PositionUpdateDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(PositionUpdateDescriptor)
+Register_ClassDescriptor(UENotificationDescriptor)
 
-PositionUpdateDescriptor::PositionUpdateDescriptor() : omnetpp::cClassDescriptor("PositionUpdate", "omnetpp::cMessage")
+UENotificationDescriptor::UENotificationDescriptor() : omnetpp::cClassDescriptor("UENotification", "omnetpp::cMessage")
 {
     propertynames = nullptr;
 }
 
-PositionUpdateDescriptor::~PositionUpdateDescriptor()
+UENotificationDescriptor::~UENotificationDescriptor()
 {
     delete[] propertynames;
 }
 
-bool PositionUpdateDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool UENotificationDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<PositionUpdate *>(obj)!=nullptr;
+    return dynamic_cast<UENotification *>(obj)!=nullptr;
 }
 
-const char **PositionUpdateDescriptor::getPropertyNames() const
+const char **UENotificationDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -270,19 +305,19 @@ const char **PositionUpdateDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *PositionUpdateDescriptor::getProperty(const char *propertyname) const
+const char *UENotificationDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int PositionUpdateDescriptor::getFieldCount() const
+int UENotificationDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 0+basedesc->getFieldCount() : 0;
+    return basedesc ? 2+basedesc->getFieldCount() : 2;
 }
 
-unsigned int PositionUpdateDescriptor::getFieldTypeFlags(int field) const
+unsigned int UENotificationDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -290,10 +325,14 @@ unsigned int PositionUpdateDescriptor::getFieldTypeFlags(int field) const
             return basedesc->getFieldTypeFlags(field);
         field -= basedesc->getFieldCount();
     }
-    return 0;
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
 }
 
-const char *PositionUpdateDescriptor::getFieldName(int field) const
+const char *UENotificationDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -301,16 +340,23 @@ const char *PositionUpdateDescriptor::getFieldName(int field) const
             return basedesc->getFieldName(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    static const char *fieldNames[] = {
+        "fileId",
+        "type",
+    };
+    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
 }
 
-int PositionUpdateDescriptor::findField(const char *fieldName) const
+int UENotificationDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount() : 0;
+    if (fieldName[0]=='f' && strcmp(fieldName, "fileId")==0) return base+0;
+    if (fieldName[0]=='t' && strcmp(fieldName, "type")==0) return base+1;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *PositionUpdateDescriptor::getFieldTypeString(int field) const
+const char *UENotificationDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -318,10 +364,14 @@ const char *PositionUpdateDescriptor::getFieldTypeString(int field) const
             return basedesc->getFieldTypeString(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    static const char *fieldTypeStrings[] = {
+        "int",
+        "int",
+    };
+    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **PositionUpdateDescriptor::getFieldPropertyNames(int field) const
+const char **UENotificationDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -330,11 +380,15 @@ const char **PositionUpdateDescriptor::getFieldPropertyNames(int field) const
         field -= basedesc->getFieldCount();
     }
     switch (field) {
+        case 1: {
+            static const char *names[] = { "enum",  nullptr };
+            return names;
+        }
         default: return nullptr;
     }
 }
 
-const char *PositionUpdateDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *UENotificationDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -343,11 +397,14 @@ const char *PositionUpdateDescriptor::getFieldProperty(int field, const char *pr
         field -= basedesc->getFieldCount();
     }
     switch (field) {
+        case 1:
+            if (!strcmp(propertyname,"enum")) return "NotificationType";
+            return nullptr;
         default: return nullptr;
     }
 }
 
-int PositionUpdateDescriptor::getFieldArraySize(void *object, int field) const
+int UENotificationDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -355,13 +412,13 @@ int PositionUpdateDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    PositionUpdate *pp = (PositionUpdate *)object; (void)pp;
+    UENotification *pp = (UENotification *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *PositionUpdateDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *UENotificationDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -369,13 +426,13 @@ const char *PositionUpdateDescriptor::getFieldDynamicTypeString(void *object, in
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    PositionUpdate *pp = (PositionUpdate *)object; (void)pp;
+    UENotification *pp = (UENotification *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string PositionUpdateDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string UENotificationDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -383,13 +440,15 @@ std::string PositionUpdateDescriptor::getFieldValueAsString(void *object, int fi
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    PositionUpdate *pp = (PositionUpdate *)object; (void)pp;
+    UENotification *pp = (UENotification *)object; (void)pp;
     switch (field) {
+        case 0: return long2string(pp->getFileId());
+        case 1: return enum2string(pp->getType(), "NotificationType");
         default: return "";
     }
 }
 
-bool PositionUpdateDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool UENotificationDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -397,13 +456,15 @@ bool PositionUpdateDescriptor::setFieldValueAsString(void *object, int field, in
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    PositionUpdate *pp = (PositionUpdate *)object; (void)pp;
+    UENotification *pp = (UENotification *)object; (void)pp;
     switch (field) {
+        case 0: pp->setFileId(string2long(value)); return true;
+        case 1: pp->setType((NotificationType)string2enum(value, "NotificationType")); return true;
         default: return false;
     }
 }
 
-const char *PositionUpdateDescriptor::getFieldStructName(int field) const
+const char *UENotificationDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -411,10 +472,12 @@ const char *PositionUpdateDescriptor::getFieldStructName(int field) const
             return basedesc->getFieldStructName(field);
         field -= basedesc->getFieldCount();
     }
-    return nullptr;
+    switch (field) {
+        default: return nullptr;
+    };
 }
 
-void *PositionUpdateDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *UENotificationDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -422,7 +485,7 @@ void *PositionUpdateDescriptor::getFieldStructValuePointer(void *object, int fie
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    PositionUpdate *pp = (PositionUpdate *)object; (void)pp;
+    UENotification *pp = (UENotification *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }

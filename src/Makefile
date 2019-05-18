@@ -34,18 +34,23 @@ OBJS = \
     $O/configuration/CGlobalConfiguration.o \
     $O/nodes/UE/CMobility.o \
     $O/nodes/UE/UE.o \
+    $O/nodes/abstraction/CCacheManager.o \
     $O/nodes/abstraction/CFileSink.o \
     $O/nodes/abstraction/CFileSource.o \
+    $O/nodes/abstraction/INode.o \
     $O/nodes/abstraction/NetworkAbstraction.o \
     $O/nodes/gNB/gNB.o \
-    $O/transfer/CFile.o \
-    $O/messages/DataPacket_m.o \
-    $O/messages/PositionUpdate_m.o
+    $O/nodes/transfer/CFile.o \
+    $O/nodes/transfer/CFileCache.o \
+    $O/nodes/messages/DataPacket_m.o \
+    $O/nodes/messages/PositionUpdate_m.o \
+    $O/nodes/messages/UENotification_m.o
 
 # Message files
 MSGFILES = \
-    messages/DataPacket.msg \
-    messages/PositionUpdate.msg
+    nodes/messages/DataPacket.msg \
+    nodes/messages/PositionUpdate.msg \
+    nodes/messages/UENotification.msg
 
 # SM files
 SMFILES =

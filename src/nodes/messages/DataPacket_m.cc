@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.3 from messages/DataPacket.msg.
+// Generated file, do not edit! Created by nedtool 5.3 from nodes/messages/DataPacket.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -185,7 +185,7 @@ EXECUTE_ON_STARTUP(
     e->insert(DP_FEEDBACK, "DP_FEEDBACK");
     e->insert(DP_REQ, "DP_REQ");
     e->insert(DP_EOF, "DP_EOF");
-    e->insert(DP_QUERY, "DP_QUERY");
+    e->insert(DP_BROADCAST, "DP_BROADCAST");
     e->insert(DP_CONFIRM, "DP_CONFIRM");
 )
 
@@ -1099,6 +1099,326 @@ void *RequestDataPacketDescriptor::getFieldStructValuePointer(void *object, int 
         field -= basedesc->getFieldCount();
     }
     RequestDataPacket *pp = (RequestDataPacket *)object; (void)pp;
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+Register_Class(ConfirmationDataPacket)
+
+ConfirmationDataPacket::ConfirmationDataPacket(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
+{
+    this->fileId = 0;
+    this->numBlocks = 0;
+    this->startBlockId = 0;
+}
+
+ConfirmationDataPacket::ConfirmationDataPacket(const ConfirmationDataPacket& other) : ::omnetpp::cPacket(other)
+{
+    copy(other);
+}
+
+ConfirmationDataPacket::~ConfirmationDataPacket()
+{
+}
+
+ConfirmationDataPacket& ConfirmationDataPacket::operator=(const ConfirmationDataPacket& other)
+{
+    if (this==&other) return *this;
+    ::omnetpp::cPacket::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void ConfirmationDataPacket::copy(const ConfirmationDataPacket& other)
+{
+    this->fileId = other.fileId;
+    this->numBlocks = other.numBlocks;
+    this->startBlockId = other.startBlockId;
+}
+
+void ConfirmationDataPacket::parsimPack(omnetpp::cCommBuffer *b) const
+{
+    ::omnetpp::cPacket::parsimPack(b);
+    doParsimPacking(b,this->fileId);
+    doParsimPacking(b,this->numBlocks);
+    doParsimPacking(b,this->startBlockId);
+}
+
+void ConfirmationDataPacket::parsimUnpack(omnetpp::cCommBuffer *b)
+{
+    ::omnetpp::cPacket::parsimUnpack(b);
+    doParsimUnpacking(b,this->fileId);
+    doParsimUnpacking(b,this->numBlocks);
+    doParsimUnpacking(b,this->startBlockId);
+}
+
+int ConfirmationDataPacket::getFileId() const
+{
+    return this->fileId;
+}
+
+void ConfirmationDataPacket::setFileId(int fileId)
+{
+    this->fileId = fileId;
+}
+
+int ConfirmationDataPacket::getNumBlocks() const
+{
+    return this->numBlocks;
+}
+
+void ConfirmationDataPacket::setNumBlocks(int numBlocks)
+{
+    this->numBlocks = numBlocks;
+}
+
+int ConfirmationDataPacket::getStartBlockId() const
+{
+    return this->startBlockId;
+}
+
+void ConfirmationDataPacket::setStartBlockId(int startBlockId)
+{
+    this->startBlockId = startBlockId;
+}
+
+class ConfirmationDataPacketDescriptor : public omnetpp::cClassDescriptor
+{
+  private:
+    mutable const char **propertynames;
+  public:
+    ConfirmationDataPacketDescriptor();
+    virtual ~ConfirmationDataPacketDescriptor();
+
+    virtual bool doesSupport(omnetpp::cObject *obj) const override;
+    virtual const char **getPropertyNames() const override;
+    virtual const char *getProperty(const char *propertyname) const override;
+    virtual int getFieldCount() const override;
+    virtual const char *getFieldName(int field) const override;
+    virtual int findField(const char *fieldName) const override;
+    virtual unsigned int getFieldTypeFlags(int field) const override;
+    virtual const char *getFieldTypeString(int field) const override;
+    virtual const char **getFieldPropertyNames(int field) const override;
+    virtual const char *getFieldProperty(int field, const char *propertyname) const override;
+    virtual int getFieldArraySize(void *object, int field) const override;
+
+    virtual const char *getFieldDynamicTypeString(void *object, int field, int i) const override;
+    virtual std::string getFieldValueAsString(void *object, int field, int i) const override;
+    virtual bool setFieldValueAsString(void *object, int field, int i, const char *value) const override;
+
+    virtual const char *getFieldStructName(int field) const override;
+    virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
+};
+
+Register_ClassDescriptor(ConfirmationDataPacketDescriptor)
+
+ConfirmationDataPacketDescriptor::ConfirmationDataPacketDescriptor() : omnetpp::cClassDescriptor("ConfirmationDataPacket", "omnetpp::cPacket")
+{
+    propertynames = nullptr;
+}
+
+ConfirmationDataPacketDescriptor::~ConfirmationDataPacketDescriptor()
+{
+    delete[] propertynames;
+}
+
+bool ConfirmationDataPacketDescriptor::doesSupport(omnetpp::cObject *obj) const
+{
+    return dynamic_cast<ConfirmationDataPacket *>(obj)!=nullptr;
+}
+
+const char **ConfirmationDataPacketDescriptor::getPropertyNames() const
+{
+    if (!propertynames) {
+        static const char *names[] = {  nullptr };
+        omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+        const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
+        propertynames = mergeLists(basenames, names);
+    }
+    return propertynames;
+}
+
+const char *ConfirmationDataPacketDescriptor::getProperty(const char *propertyname) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->getProperty(propertyname) : nullptr;
+}
+
+int ConfirmationDataPacketDescriptor::getFieldCount() const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? 3+basedesc->getFieldCount() : 3;
+}
+
+unsigned int ConfirmationDataPacketDescriptor::getFieldTypeFlags(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldTypeFlags(field);
+        field -= basedesc->getFieldCount();
+    }
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+}
+
+const char *ConfirmationDataPacketDescriptor::getFieldName(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldName(field);
+        field -= basedesc->getFieldCount();
+    }
+    static const char *fieldNames[] = {
+        "fileId",
+        "numBlocks",
+        "startBlockId",
+    };
+    return (field>=0 && field<3) ? fieldNames[field] : nullptr;
+}
+
+int ConfirmationDataPacketDescriptor::findField(const char *fieldName) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount() : 0;
+    if (fieldName[0]=='f' && strcmp(fieldName, "fileId")==0) return base+0;
+    if (fieldName[0]=='n' && strcmp(fieldName, "numBlocks")==0) return base+1;
+    if (fieldName[0]=='s' && strcmp(fieldName, "startBlockId")==0) return base+2;
+    return basedesc ? basedesc->findField(fieldName) : -1;
+}
+
+const char *ConfirmationDataPacketDescriptor::getFieldTypeString(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldTypeString(field);
+        field -= basedesc->getFieldCount();
+    }
+    static const char *fieldTypeStrings[] = {
+        "int",
+        "int",
+        "int",
+    };
+    return (field>=0 && field<3) ? fieldTypeStrings[field] : nullptr;
+}
+
+const char **ConfirmationDataPacketDescriptor::getFieldPropertyNames(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldPropertyNames(field);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+const char *ConfirmationDataPacketDescriptor::getFieldProperty(int field, const char *propertyname) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldProperty(field, propertyname);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+int ConfirmationDataPacketDescriptor::getFieldArraySize(void *object, int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldArraySize(object, field);
+        field -= basedesc->getFieldCount();
+    }
+    ConfirmationDataPacket *pp = (ConfirmationDataPacket *)object; (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+const char *ConfirmationDataPacketDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldDynamicTypeString(object,field,i);
+        field -= basedesc->getFieldCount();
+    }
+    ConfirmationDataPacket *pp = (ConfirmationDataPacket *)object; (void)pp;
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+std::string ConfirmationDataPacketDescriptor::getFieldValueAsString(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldValueAsString(object,field,i);
+        field -= basedesc->getFieldCount();
+    }
+    ConfirmationDataPacket *pp = (ConfirmationDataPacket *)object; (void)pp;
+    switch (field) {
+        case 0: return long2string(pp->getFileId());
+        case 1: return long2string(pp->getNumBlocks());
+        case 2: return long2string(pp->getStartBlockId());
+        default: return "";
+    }
+}
+
+bool ConfirmationDataPacketDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->setFieldValueAsString(object,field,i,value);
+        field -= basedesc->getFieldCount();
+    }
+    ConfirmationDataPacket *pp = (ConfirmationDataPacket *)object; (void)pp;
+    switch (field) {
+        case 0: pp->setFileId(string2long(value)); return true;
+        case 1: pp->setNumBlocks(string2long(value)); return true;
+        case 2: pp->setStartBlockId(string2long(value)); return true;
+        default: return false;
+    }
+}
+
+const char *ConfirmationDataPacketDescriptor::getFieldStructName(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldStructName(field);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    };
+}
+
+void *ConfirmationDataPacketDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldStructValuePointer(object, field, i);
+        field -= basedesc->getFieldCount();
+    }
+    ConfirmationDataPacket *pp = (ConfirmationDataPacket *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }

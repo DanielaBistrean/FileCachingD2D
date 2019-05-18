@@ -22,6 +22,7 @@ network BasicNetwork
 {
     parameters:
         int numNodes = default (10);
+		int numFiles = default (17);
 
         double radius = default(406);
         double cx = default(radius + 182);
@@ -30,7 +31,9 @@ network BasicNetwork
         double velocityMax = default(5);
 
         double updateInterval = default(1000); //1000ms
-        double dD2DMaxRange = default(1000);
+        double D2DMaxRange = default(1000);
+        
+        double D2DEnquiryTimeout = default (0.5);
 
         @display("bgb=1176,812;bgi=background/streetmap,s");
 

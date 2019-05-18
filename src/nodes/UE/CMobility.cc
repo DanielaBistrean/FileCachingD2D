@@ -2,7 +2,7 @@
 
 #include "../../configuration/CGlobalConfiguration.h"
 
-#include "../../messages/PositionUpdate_m.h"
+#include "../messages/PositionUpdate_m.h"
 
 CMobility::CMobility (INode * pNode)
 : m_pNode {pNode}
@@ -28,7 +28,7 @@ CMobility::CMobility (INode * pNode, double x, double y, double velocity, double
 void
 CMobility::process (omnetpp::cMessage * pMsg)
 {
-    PositionUpdate *pUpdate = omnetpp::check_and_cast <PositionUpdate *> (pMsg);
+    PositionUpdate *pUpdate = dynamic_cast <PositionUpdate *> (pMsg);
 
     if (pUpdate)
         do_update ();
@@ -85,8 +85,8 @@ CMobility::do_update ()
         m_posY = (2 * m_cy) - m_posY;
     }
 
-    m_pNode->getDisplay ().setTagArg ("p", 0, long (m_posX));
-    m_pNode->getDisplay ().setTagArg ("p", 1, long (m_posY));
+    m_pNode->getNode ()->getDisplayString ().setTagArg ("p", 0, long (m_posX));
+    m_pNode->getNode ()->getDisplayString ().setTagArg ("p", 1, long (m_posY));
 
     PositionUpdate *pUpdate = new PositionUpdate ();
     m_pNode->sendInternal (pUpdate, m_updateInterval);

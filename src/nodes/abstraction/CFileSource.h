@@ -1,8 +1,8 @@
 #ifndef D2D_CFILESOURCE_H
 #define D2D_CFILESOURCE_H 1
 
-#include "../../transfer/CFileCache.h"
-#include "../../messages/DataPacket_m.h"
+#include "../transfer/CFileCache.h"
+#include "../messages/DataPacket_m.h"
 
 #include "INode.h"
 #include "IProcessor.h"
