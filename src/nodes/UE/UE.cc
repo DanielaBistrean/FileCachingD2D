@@ -41,14 +41,19 @@ void UE::sendInternal (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset)
     scheduleAt (simTime () + offset, pMsg);
 }
 
-void UE::sendUpperLayer (omnetpp::cMessage * pMsg)
+void UE::sendOut (omnetpp::cMessage * pMsg, int nodeId)
 {
+    cGate * out = nullptr;
 
-}
+    if (nodeId == -1)
+        out = NetworkAbstraction::getInstance ().getBaseGate ();
+    else
+        out = NetworkAbstraction::getInstance ().getUserGate (nodeId);
 
-void UE::sendLowerLayer (omnetpp::cMessage * pMsg)
-{
+    if (! out)
+        return;
 
+    sendDirect(pMsg, out);
 }
 
 omnetpp::cDisplayString& UE::getDisplay ()

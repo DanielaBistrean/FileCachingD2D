@@ -36,6 +36,10 @@ public:
     void registerBase (gNB * base);
     void deregisterBase ();
 
+public:
+    cGate * getUserGate (int userId);
+    cGate * getBaseGate ();
+
 private:
     NetworkAbstraction () : m_base {nullptr} {};
 

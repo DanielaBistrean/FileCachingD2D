@@ -34,11 +34,17 @@ OBJS = \
     $O/configuration/CGlobalConfiguration.o \
     $O/nodes/UE/CMobility.o \
     $O/nodes/UE/UE.o \
+    $O/nodes/abstraction/CFileSink.o \
+    $O/nodes/abstraction/CFileSource.o \
+    $O/nodes/abstraction/NetworkAbstraction.o \
     $O/nodes/gNB/gNB.o \
+    $O/transfer/CFile.o \
+    $O/messages/DataPacket_m.o \
     $O/messages/PositionUpdate_m.o
 
 # Message files
 MSGFILES = \
+    messages/DataPacket.msg \
     messages/PositionUpdate.msg
 
 # SM files

@@ -20,6 +20,9 @@
 
 #include <memory>
 
+#include "../../messages/DataPacket_m.h"
+#include "../../transfer/CFileCache.h"
+
 #include "../abstraction/INode.h"
 
 #include "CMobility.h"
@@ -30,8 +33,7 @@ class UE : public cSimpleModule, public INode
 {
 public:
     virtual void sendInternal   (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset) override;
-    virtual void sendUpperLayer (omnetpp::cMessage * pMsg) override;
-    virtual void sendLowerLayer (omnetpp::cMessage * pMsg) override;
+    virtual void sendOut (omnetpp::cMessage * pMsg, int nodeId) override;
 
     virtual omnetpp::cDisplayString& getDisplay () override;
 
@@ -41,6 +43,8 @@ protected:
     virtual void finish();
 
 private:
+    CFileCache m_cache;
+
     std::unique_ptr <CMobility> m_pMobility;
 };
 

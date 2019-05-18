@@ -6,8 +6,7 @@
 struct INode
 {
     virtual void sendInternal   (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset) = 0;
-    virtual void sendUpperLayer (omnetpp::cMessage * pMsg) = 0;
-    virtual void sendLowerLayer (omnetpp::cMessage * pMsg) = 0;
+    virtual void sendOut (omnetpp::cMessage * pMsg, int nodeId) = 0;
 
     virtual omnetpp::cDisplayString& getDisplay () = 0;
 };

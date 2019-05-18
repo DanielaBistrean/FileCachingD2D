@@ -51,3 +51,22 @@ NetworkAbstraction::deregisterBase ()
 {
     m_base = nullptr;
 }
+
+cGate *
+NetworkAbstraction::getUserGate (int userId)
+{
+    auto user = m_users.find (userId);
+    if (user == m_users.end ())
+        return nullptr;
+
+    return user->second->gate ("radioIn");
+}
+
+cGate *
+NetworkAbstraction::getBaseGate ()
+{
+    if (! m_base)
+        return nullptr;
+
+    return m_base->gate ("radioIn");
+}
