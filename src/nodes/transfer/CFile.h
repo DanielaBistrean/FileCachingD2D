@@ -19,6 +19,8 @@ public:
     std::size_t size   () { return m_bytes;          };
     std::size_t blocks () { return m_blocks.size (); };
 
+    std::size_t available ();
+
 private:
     std::vector <bool> m_blocks;
     std::size_t        m_bytes;

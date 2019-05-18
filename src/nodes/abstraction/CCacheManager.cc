@@ -71,12 +71,6 @@ CCacheManager::process (omnetpp::cMessage * pMsg)
 }
 
 void
-CCacheManager::do_processBroadcast (ControlPacket * pDataPacket)
-{
-
-}
-
-void
 CCacheManager::do_processSelfMessages (omnetpp::cMessage * pSelfMessage)
 {
     EV_STATICCONTEXT
@@ -243,4 +237,50 @@ CCacheManager::do_processConfirmation (ControlPacket * pControlPacket)
     confirmation.availableBlocks = numBlocks;
 
     it->second.push (confirmation);
+    EV << "Saved confirmation from node " << sId << "for analysis" << std::endl;
+}
+
+void
+CCacheManager::do_processBroadcast (ControlPacket * pControlPacket)
+{
+    EV_STATICCONTEXT
+
+    auto sId = pControlPacket->getSourceId ();
+    auto dId = pControlPacket->getDestinationId ();
+
+    omnetpp::cPacket * pPacket = pControlPacket->decapsulate ();
+
+    if (! pPacket)
+    {
+        EV_WARN << "Could not decapsulate packet" << std::endl;
+        return;
+    }
+
+    BroadcastControlPacket * pBroadcast = dynamic_cast <BroadcastControlPacket *> (pPacket);
+
+    if (! pBroadcast)
+    {
+        EV_WARN << "Not a broadcast packet. Something bad happened" << std::endl;
+        return;
+    }
+
+    FileId fileId = pBroadcast->getFileId ();
+    int startBlockId = pBroadcast->getStartBlockId ();
+
+    int available = m_pCache->getAvailability (fileId, startBlockId);
+    if (available <= 0)
+        return;
+
+    ControlPacket * pResponse = new ControlPacket ();
+    pResponse->setSourceId (m_pNode->getNode ()->getId ());
+    pResponse->setDestinationId (sId);
+    pResponse->setType (CP_CONFIRM);
+
+    ConfirmationControlPacket * pConfirmation = new ConfirmationControlPacket ();
+    pConfirmation->setFileId (fileId);
+    pConfirmation->setStartBlockId (startBlockId);
+    pConfirmation->setNumBlocks (available);
+
+    pResponse->encapsulate (pConfirmation);
+    m_pNode->sendOut (pResponse, sId);
 }

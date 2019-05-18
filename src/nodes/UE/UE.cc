@@ -38,7 +38,7 @@ void UE::initialize()
 
 void UE::handleMessage(cMessage *msg)
 {
-    m_pMobility->process     (msg);
+//    m_pMobility->process     (msg);
     m_pFileSink->process     (msg);
     m_pFileSource->process   (msg);
     m_pCacheManager->process (msg);

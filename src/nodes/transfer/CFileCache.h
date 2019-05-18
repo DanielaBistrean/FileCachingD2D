@@ -38,6 +38,9 @@ public:
     void setCacheState (FileId fileId, CacheState state);
 
     void recalculatePriorities ();
+
+public:
+    int getAvailability (FileId fileId, int blockId = 0);
 };
 
 #endif // D2D_CFILECACHE_H

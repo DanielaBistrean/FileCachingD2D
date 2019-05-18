@@ -27,3 +27,13 @@ CFile::unsetBlock (std::size_t index)
     m_blocks.at (index) = false;
 }
 
+std::size_t
+CFile::available ()
+{
+    std::size_t count = 0;
+
+    for (auto b : m_blocks)
+        if (b) count++;
+
+    return count;
+}
