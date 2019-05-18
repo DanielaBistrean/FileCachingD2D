@@ -20,7 +20,7 @@
 #include <queue>
 #include <algorithm>
 
-#include "../messages/DataPacket_m.h"
+#include "../messages/ControlPacket_m.h"
 #include "../transfer/CFileCache.h"
 
 #include "INode.h"
@@ -37,7 +37,7 @@ public:
     virtual void process (omnetpp::cMessage * pMsg) override;
 
 private:
-    void do_processConfirmation (DataPacket * pDataPacket);
+    void do_processConfirmation (ControlPacket * pDataPacket);
     void do_processSelfMessages (omnetpp::cMessage * pSelfMessage);
 
     void do_processTimeout (FileId fileId);

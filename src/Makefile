@@ -42,12 +42,14 @@ OBJS = \
     $O/nodes/gNB/gNB.o \
     $O/nodes/transfer/CFile.o \
     $O/nodes/transfer/CFileCache.o \
+    $O/nodes/messages/ControlPacket_m.o \
     $O/nodes/messages/DataPacket_m.o \
     $O/nodes/messages/PositionUpdate_m.o \
     $O/nodes/messages/UENotification_m.o
 
 # Message files
 MSGFILES = \
+    nodes/messages/ControlPacket.msg \
     nodes/messages/DataPacket.msg \
     nodes/messages/PositionUpdate.msg \
     nodes/messages/UENotification.msg

@@ -15,7 +15,7 @@
 
 #include "CCacheManager.h"
 
-#include "../messages/DataPacket_m.h"
+#include "../messages/ControlPacket_m.h"
 #include "../messages/UENotification_m.h"
 #include "../../configuration/CGlobalConfiguration.h"
 
@@ -31,7 +31,8 @@ CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink)
         m_files.push_back ({id, CacheData ()});
     }
 
-    do_scheduleNextRequest ();
+    if (m_pNode->getNode ()->getId () == 2)
+        do_scheduleNextRequest ();
 }
 
 bool
@@ -67,15 +68,15 @@ CCacheManager::process (omnetpp::cMessage * pMsg)
         return;
     }
 
-    DataPacket *pDataPacket = dynamic_cast <DataPacket *> (pMsg);
+    ControlPacket *pControlPacket = dynamic_cast <ControlPacket *> (pMsg);
 
-    if (! pDataPacket)
+    if (! pControlPacket)
         return;
 
-    switch (pDataPacket->getType())
+    switch (pControlPacket->getType())
     {
     case DP_CONFIRM:
-        do_processConfirmation (pDataPacket);
+        do_processConfirmation (pControlPacket);
         break;
     default:
         break;
@@ -163,16 +164,16 @@ CCacheManager::do_processRequest ()
     do_setCacheState (fileId, ENQUIRY);
     m_enquires [fileId] = {};
 
-    DataPacket * pResponse = new DataPacket ();
+    ControlPacket * pResponse = new ControlPacket ();
     pResponse->setSourceId (m_pNode->getNode ()->getId ());
     pResponse->setDestinationId (-1);
     pResponse->setType (DP_BROADCAST);
 
-    RequestDataPacket * pRequest = new RequestDataPacket ();
-    pRequest->setFileId (fileId);
-    pRequest->setStartBlockId (0); // TODO: check first missing block
+    BroadcastControlPacket * pBroadcast = new BroadcastControlPacket ();
+    pBroadcast->setFileId (fileId);
+    pBroadcast->setStartBlockId (0); // TODO: check first missing block
 
-    pResponse->encapsulate (pRequest);
+    pResponse->encapsulate (pBroadcast);
 
     m_pNode->sendBroadcast(pResponse);
 
@@ -225,14 +226,14 @@ CCacheManager::do_recalculatePriorities ()
 }
 
 void
-CCacheManager::do_processConfirmation (DataPacket * pDataPacket)
+CCacheManager::do_processConfirmation (ControlPacket * pControlPacket)
 {
     EV_STATICCONTEXT
 
-    auto sId = pDataPacket->getSourceId ();
-    auto dId = pDataPacket->getDestinationId ();
+    auto sId = pControlPacket->getSourceId ();
+    auto dId = pControlPacket->getDestinationId ();
 
-    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    omnetpp::cPacket * pPacket = pControlPacket->decapsulate ();
 
     if (! pPacket)
     {
@@ -240,7 +241,7 @@ CCacheManager::do_processConfirmation (DataPacket * pDataPacket)
         return;
     }
 
-    ConfirmationDataPacket * pConfirmation = dynamic_cast <ConfirmationDataPacket *> (pPacket);
+    ConfirmationControlPacket * pConfirmation = dynamic_cast <ConfirmationControlPacket *> (pPacket);
 
     if (! pConfirmation)
     {
