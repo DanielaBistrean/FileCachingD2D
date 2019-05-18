@@ -17,6 +17,9 @@ package filecachingd2d.nodes.gNB;
 
 simple gNB
 {
+    parameters:
+        @display("i=device/antennatower");
+
     gates:
         inout radioIn @directIn;
 }

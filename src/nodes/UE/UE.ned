@@ -17,6 +17,9 @@ package filecachingd2d.nodes.UE;
 
 simple UE
 {
+    parameters:
+        @display("i=device/cellphone");
+
     gates:
         inout radioIn @directIn;
 }

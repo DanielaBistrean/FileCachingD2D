@@ -22,7 +22,13 @@ network BasicNetwork
 {
     parameters:
         int numNodes = default (10);
+
+        @display("bgb=1176,812;bgi=background/streetmap,s");
+
     submodules:
         n [numNodes] : UE;
-       	gNB          : gNB;
+		gNB          : gNB
+		{
+			@display("p=588,406;r=406");
+		}
 }
