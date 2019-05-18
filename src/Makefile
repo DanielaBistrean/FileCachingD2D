@@ -30,10 +30,16 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
-OBJS = $O/nodes/UE/UE.o $O/nodes/abstraction/NetworkAbstraction.o $O/nodes/gNB/gNB.o
+OBJS = \
+    $O/configuration/CGlobalConfiguration.o \
+    $O/nodes/UE/CMobility.o \
+    $O/nodes/UE/UE.o \
+    $O/nodes/gNB/gNB.o \
+    $O/messages/PositionUpdate_m.o
 
 # Message files
-MSGFILES =
+MSGFILES = \
+    messages/PositionUpdate.msg
 
 # SM files
 SMFILES =

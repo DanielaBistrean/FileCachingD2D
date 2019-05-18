@@ -22,14 +22,36 @@ Define_Module(UE);
 void UE::initialize()
 {
     NetworkAbstraction::getInstance ().registerUser (this);
+
+    m_pMobility = std::unique_ptr <CMobility> (new CMobility (this));
 }
 
 void UE::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    m_pMobility->process (msg);
 }
 
 void UE::finish()
 {
     NetworkAbstraction::getInstance ().deregisterUser (this);
+}
+
+void UE::sendInternal (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset)
+{
+    scheduleAt (simTime () + offset, pMsg);
+}
+
+void UE::sendUpperLayer (omnetpp::cMessage * pMsg)
+{
+
+}
+
+void UE::sendLowerLayer (omnetpp::cMessage * pMsg)
+{
+
+}
+
+omnetpp::cDisplayString& UE::getDisplay ()
+{
+    return getDisplayString();
 }

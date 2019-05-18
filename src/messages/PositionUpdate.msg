@@ -13,31 +13,5 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package filecachingd2d.networks;
-
-import filecachingd2d.nodes.UE.*;
-import filecachingd2d.nodes.gNB.*;
-
-network BasicNetwork
-{
-    parameters:
-        int numNodes = default (10);
-
-        double radius = default(406);
-        double cx = default(radius + 182);
-        double cy = default(radius);
-        double deltaHeadingMax = default(30);
-        double velocityMax = default(5);
-
-        double updateInterval = default(1000); //1000ms
-        double dD2DMaxRange = default(1000);
-
-        @display("bgb=1176,812;bgi=background/streetmap,s");
-
-    submodules:
-        n [numNodes] : UE;
-		gNB          : gNB
-		{
-			@display("p=588,406;r=406");
-		}
-}
+message PositionUpdate
+{}

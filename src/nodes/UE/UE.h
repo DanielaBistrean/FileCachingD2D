@@ -18,17 +18,30 @@
 
 #include <omnetpp.h>
 
+#include <memory>
+
+#include "../abstraction/INode.h"
+
+#include "CMobility.h"
+
 using namespace omnetpp;
 
-/**
- * TODO - Generated class
- */
-class UE : public cSimpleModule
+class UE : public cSimpleModule, public INode
 {
-  protected:
+public:
+    virtual void sendInternal   (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset) override;
+    virtual void sendUpperLayer (omnetpp::cMessage * pMsg) override;
+    virtual void sendLowerLayer (omnetpp::cMessage * pMsg) override;
+
+    virtual omnetpp::cDisplayString& getDisplay () override;
+
+protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void finish();
+
+private:
+    std::unique_ptr <CMobility> m_pMobility;
 };
 
 #endif

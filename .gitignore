@@ -33,4 +33,4 @@
 
 # OMNet++
 out
-src/FileCachingD2D
+src/FileCachingD2D*
