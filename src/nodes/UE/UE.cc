@@ -26,7 +26,7 @@ void UE::initialize()
     m_pMobility     = std::unique_ptr <CMobility>     (new CMobility     (this));
     m_pFileSink     = std::unique_ptr <CFileSink>     (new CFileSink     (this, &m_cache));
     m_pFileSource   = std::unique_ptr <CFileSource>   (new CFileSource   (this, &m_cache));
-    m_pCacheManager = std::unique_ptr <CCacheManager> (new CCacheManager (this, m_pFileSink.get ()));
+    m_pCacheManager = std::unique_ptr <CCacheManager> (new CCacheManager (this, m_pFileSink.get (), &m_cache));
 
     if (getId () == 8)
     {

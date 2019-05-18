@@ -31,7 +31,7 @@
 class CCacheManager : public IProcessor
 {
 public:
-    CCacheManager(INode * pNode, CFileSink * pFileSink);
+    CCacheManager(INode * pNode, CFileSink * pFileSink, CFileCache * pCache);
 
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
@@ -50,23 +50,6 @@ private:
     void do_scheduleTimeout (FileId fileId);
 
 private:
-    enum CacheStatus
-    {
-        ERROR = -2,
-        ENQUIRY = -1,
-        NOTPRESENT = 0,
-        DOWNLOADING = 1,
-        FULL = 2
-    };
-
-    struct CacheData
-    {
-        CacheStatus status;
-        int score;
-
-        CacheData () : status {NOTPRESENT}, score {0} {};
-    };
-
     struct ConfirmationData
     {
         int nodeId;
@@ -74,16 +57,8 @@ private:
         int availableBlocks;
     };
 
-    using CacheEntry = std::pair <FileId, CacheData>;
-
-    friend bool operator<  (const CacheEntry &lhs, const CacheEntry &rhs);
-    friend bool operator== (const CacheEntry &lhs, const CacheEntry &rhs);
-
     friend bool operator<  (const ConfirmationData &lhs, const ConfirmationData &rhs);
     friend bool operator== (const ConfirmationData &lhs, const ConfirmationData &rhs);
-
-    CacheStatus do_getCacheState (FileId fileId);
-    void do_setCacheState (FileId fileId, CacheStatus status);
 
     void do_recalculatePriorities ();
 
@@ -93,7 +68,7 @@ private:
 
     bool m_bDownloading;
 
-    std::vector <CacheEntry> m_files;
+    CFileCache * m_pCache;
     std::map <FileId, std::priority_queue <ConfirmationData> > m_enquires;
 };
 

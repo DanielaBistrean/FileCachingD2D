@@ -85,7 +85,7 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
         return;
     }
 
-    CFile file = it->second;
+    CFile file = it->second.file;
 
     if (file.blocks () <= blockId)
     {

@@ -61,7 +61,7 @@ CFileSource::do_processRequest (DataPacket * pDataPacket)
         return;
     }
 
-    CFile file = it->second;
+    CFile file = it->second.file;
     if (! file.hasBlock (startBlockId))
         return;
 
@@ -105,7 +105,7 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
     if (it == m_pCache->end ())
         return;
 
-    CFile file = it->second;
+    CFile file = it->second.file;
 
     if (! ack)
     {

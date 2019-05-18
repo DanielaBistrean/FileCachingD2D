@@ -19,32 +19,16 @@
 #include "../messages/UENotification_m.h"
 #include "../../configuration/CGlobalConfiguration.h"
 
-CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink)
+CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink, CFileCache * pCache)
 : m_pNode {pNode}
 , m_pFileSink {pFileSink}
 , m_bDownloading {false}
+, m_pCache {pCache}
 {
     int numFiles = CGlobalConfiguration::getInstance ().get ("numFiles");
 
-    for (std::size_t id = 0; id < numFiles; ++id)
-    {
-        m_files.push_back ({id, CacheData ()});
-    }
-
     if (m_pNode->getNode ()->getId () == 2)
         do_scheduleNextEnquiry ();
-}
-
-bool
-operator< (const CCacheManager::CacheEntry &lhs, const CCacheManager::CacheEntry &rhs)
-{
-    return (lhs.second.score * lhs.second.status) < (rhs.second.score * lhs.second.status);
-}
-
-bool
-operator== (const CCacheManager::CacheEntry &lhs, const CCacheManager::CacheEntry &rhs)
-{
-    return (lhs.second.score * lhs.second.status) < (rhs.second.score * lhs.second.status);
 }
 
 bool
@@ -133,7 +117,7 @@ CCacheManager::do_processTimeout (FileId fileId)
     }
 
     auto queue = it->second;
-    do_setCacheState(fileId, DOWNLOADING);
+    m_pCache->setCacheState(fileId, DOWNLOADING);
     m_bDownloading = true;
 
     if (queue.empty ())
@@ -161,8 +145,8 @@ CCacheManager::do_prepareEnquiry ()
     omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
 
     std::vector <FileId> candidates;
-    for (auto & entry : m_files)
-        if (entry.second.status == NOTPRESENT) candidates.push_back (entry.first);
+    for (auto & entry : *m_pCache)
+        if (entry.second.state == NOTPRESENT) candidates.push_back (entry.first);
 
     if (candidates.empty ())
         return;
@@ -170,7 +154,7 @@ CCacheManager::do_prepareEnquiry ()
     std::size_t winner = random->intRand (candidates.size ());
     FileId fileId = candidates [winner];
 
-    do_setCacheState (fileId, ENQUIRY);
+    m_pCache->setCacheState (fileId, ENQUIRY);
     m_enquires [fileId] = {};
 
     ControlPacket * pResponse = new ControlPacket ();
@@ -212,26 +196,10 @@ CCacheManager::do_scheduleTimeout (FileId fileId)
     m_pNode->sendInternal (pNotification, timeout);
 }
 
-CCacheManager::CacheStatus
-CCacheManager::do_getCacheState (FileId fileId)
-{
-    for (auto entry : m_files)
-        if (entry.first == fileId) return entry.second.status;
-
-    return ERROR;
-}
-
-void
-CCacheManager::do_setCacheState (FileId fileId, CCacheManager::CacheStatus status)
-{
-    for (auto entry : m_files)
-        if (entry.first == fileId) { entry.second.status = status; return; }
-}
-
 void
 CCacheManager::do_recalculatePriorities ()
 {
-    std::sort(m_files.begin(), m_files.end());
+    m_pCache->recalculatePriorities ();
 }
 
 void

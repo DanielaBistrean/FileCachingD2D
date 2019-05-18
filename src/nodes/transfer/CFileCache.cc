@@ -8,6 +8,44 @@ CFileCache::CFileCache (bool available)
 
     for (std::size_t id = 0; id < numFiles; ++id)
     {
-        insert({id, CFile (16000, available)});
+        insert({id, CacheData (16000, available)});
     }
+}
+
+CacheState
+CFileCache::getCacheState (FileId fileId)
+{
+    auto it = find (fileId);
+    if (it == end ())
+        return ERROR;
+
+    return it->second.state;
+}
+
+void
+CFileCache::setCacheState (FileId fileId, CacheState state)
+{
+    auto it = find (fileId);
+    if (it == end ())
+        return;
+
+    it->second.state = state;
+}
+
+void
+CFileCache::recalculatePriorities ()
+{
+//    std::sort(begin(), end());
+}
+
+bool
+operator< (const CacheData &lhs, const CacheData &rhs)
+{
+    return (lhs.score * lhs.state) < (rhs.score * lhs.state);
+}
+
+bool
+operator== (const CacheData &lhs, const CacheData &rhs)
+{
+    return (lhs.score * lhs.state) < (rhs.score * lhs.state);
 }
