@@ -24,8 +24,6 @@ CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink, CFileCache * 
 , m_pFileSink {pFileSink}
 , m_pCache {pCache}
 {
-    int numFiles = CGlobalConfiguration::getInstance ().get ("numFiles");
-
     if (m_pNode->getNode ()->getId () == 2)
         do_scheduleNextEnquiry ();
 }
@@ -176,8 +174,10 @@ CCacheManager::do_scheduleNextEnquiry ()
     UENotification * pNotification = new UENotification ();
     pNotification->setType (N_SCHEDULE);
 
-    // TODO: make it random
-    m_pNode->sendInternal (pNotification, 10);
+    omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
+
+    // New schedule can be in interval [10, 20).
+    m_pNode->sendInternal (pNotification, 10 + (random->doubleRand () * 10));
 }
 
 void
