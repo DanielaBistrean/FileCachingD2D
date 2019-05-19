@@ -21,8 +21,7 @@
 #include <algorithm>
 
 #include "../messages/ControlPacket_m.h"
-#include "../transfer/CFileCache.h"
-
+#include "../transfer/CFileStore.h"
 #include "INode.h"
 #include "IProcessor.h"
 
@@ -35,10 +34,35 @@ struct FileInfo
     std::vector <std::size_t> availableBlocks;
 };
 
+enum CacheState
+{
+    ERROR = -2,
+    ENQUIRY = -1,
+    NOTPRESENT = 0,
+    DOWNLOADING = 1,
+    FULL = 2
+};
+
+struct CacheData
+{
+    CacheState state;
+    int score;
+
+    CacheData (bool available = false)
+    : state {available ? FULL : NOTPRESENT}, score {1} {};
+
+    friend bool operator<  (const CacheData &lhs, const CacheData &rhs);
+    friend bool operator== (const CacheData &lhs, const CacheData &rhs);
+};
+
+using CacheEntry = std::pair <FileId, CacheData>;
+bool operator<  (const CacheEntry &lhs, const CacheEntry &rhs);
+bool operator== (const CacheEntry &lhs, const CacheEntry &rhs);
+
 class CCacheManager : public IProcessor
 {
 public:
-    CCacheManager(INode * pNode, CFileSink * pFileSink, CFileCache * pCache);
+    CCacheManager(INode * pNode, CFileSink * pFileSink, CFileStore * pStore);
 
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
@@ -56,11 +80,14 @@ private:
 private:
     void do_recalculatePriorities ();
 
+    int do_findCacheEntry (FileId fileId);
+
 private:
     INode * m_pNode;
     CFileSink * m_pFileSink;
+    CFileStore * m_pStore;
 
-    CFileCache * m_pCache;
+    std::vector <CacheEntry> m_cache;
 };
 
 #endif /* NODES_ABSTRACTION_CCACHEMANAGER_H_ */

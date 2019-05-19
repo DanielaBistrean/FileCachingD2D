@@ -43,7 +43,7 @@ OBJS = \
     $O/nodes/abstraction/NetworkAbstraction.o \
     $O/nodes/gNB/gNB.o \
     $O/nodes/transfer/CFile.o \
-    $O/nodes/transfer/CFileCache.o \
+    $O/nodes/transfer/CFileStore.o \
     $O/nodes/messages/ControlPacket_m.o \
     $O/nodes/messages/DataPacket_m.o \
     $O/nodes/messages/PositionUpdate_m.o \

@@ -21,13 +21,12 @@
 #include <memory>
 
 #include "../messages/DataPacket_m.h"
-#include "../transfer/CFileCache.h"
-
 #include "../abstraction/INode.h"
 #include "../abstraction/CFileSink.h"
 #include "../abstraction/CFileSource.h"
 #include "../abstraction/CCacheManager.h"
 #include "../abstraction/CNetworkManager.h"
+#include "../transfer/CFileStore.h"
 
 #include "CMobility.h"
 #include "CMainLoop.h"
@@ -49,7 +48,7 @@ protected:
     virtual void finish();
 
 private:
-    CFileCache m_cache;
+    CFileStore m_cache;
 
     std::unique_ptr <CMainLoop>       m_pMainLoop;
     std::unique_ptr <CMobility>       m_pMobility;

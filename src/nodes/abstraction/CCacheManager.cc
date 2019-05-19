@@ -19,11 +19,14 @@
 #include "../messages/UENotification_m.h"
 #include "../../configuration/CGlobalConfiguration.h"
 
-CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink, CFileCache * pCache)
+CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink, CFileStore * pStore)
 : m_pNode {pNode}
 , m_pFileSink {pFileSink}
-, m_pCache {pCache}
-{}
+, m_pStore {pStore}
+{
+    for (auto & file : *m_pStore)
+        m_cache.push_back ({file.first, CacheData (file.second.available () == file.second.blocks ())});
+}
 
 void
 CCacheManager::process (omnetpp::cMessage * pMsg)
@@ -68,7 +71,7 @@ CCacheManager::selectFileForDownload (FileId &fileId)
     omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
 
     std::vector <FileId> candidates;
-    for (auto & entry : *m_pCache)
+    for (auto & entry : m_cache)
         if (entry.second.state == NOTPRESENT) candidates.push_back (entry.first);
 
     if (candidates.empty ())
@@ -84,7 +87,7 @@ CCacheManager::selectFileForDownload (FileId &fileId)
 void
 CCacheManager::do_recalculatePriorities ()
 {
-    m_pCache->recalculatePriorities ();
+
 }
 
 bool
@@ -92,15 +95,15 @@ CCacheManager::getFileInfo (FileId fileId, FileInfo &fileInfo)
 {
     FileInfo info;
 
-    auto it = m_pCache->find (fileId);
-    if (it == m_pCache->end ())
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
         return false;
 
-    for (std::size_t i = 0; i < it->second.file.blocks (); ++i)
-        if (it->second.file.hasBlock (i)) info.availableBlocks.push_back (i);
+    for (std::size_t i = 0; i < it->second.blocks (); ++i)
+        if (it->second.hasBlock (i)) info.availableBlocks.push_back (i);
 
-    info.blocks = it->second.file.blocks ();
-    info.bytes = it->second.file.size ();
+    info.blocks = it->second.blocks ();
+    info.bytes = it->second.size ();
 
     fileInfo = info;
     return true;
@@ -109,19 +112,35 @@ CCacheManager::getFileInfo (FileId fileId, FileInfo &fileInfo)
 CacheState
 CCacheManager::getCacheState (FileId fileId)
 {
-    auto it = m_pCache->find (fileId);
-    if (it == m_pCache->end ())
+    std::size_t idx = do_findCacheEntry (fileId);
+    if (idx < 0)
         return ERROR;
 
-    return it->second.state;
+    return m_cache [idx].second.state;
 }
 
 void
 CCacheManager::setCacheState (FileId fileId, CacheState state)
 {
-    auto it = m_pCache->find (fileId);
-    if (it == m_pCache->end ())
+    std::size_t idx = do_findCacheEntry (fileId);
+    if (idx < 0)
         return;
 
-    it->second.state = state;
+    m_cache [idx].second.state = state;
 }
+
+int
+CCacheManager::do_findCacheEntry (FileId fileId)
+{
+    for (std::size_t i = 0; i < m_cache.size (); ++i)
+        if (m_cache [i].first == fileId) return i;
+
+    return -1;
+}
+
+bool
+operator< (const CacheData &lhs, const CacheData &rhs)
+{
+    return (lhs.score * lhs.state) < (rhs.score * lhs.state);
+}
+

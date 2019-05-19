@@ -21,7 +21,7 @@
 
 #include "../abstraction/INode.h"
 #include "../abstraction/CFileSource.h"
-#include "../transfer/CFileCache.h"
+#include "../transfer/CFileStore.h"
 
 using namespace omnetpp;
 
@@ -42,7 +42,7 @@ protected:
     virtual void finish();
 
 private:
-    CFileCache m_cache;
+    CFileStore m_cache;
 
     std::unique_ptr <CFileSource> m_pFileSource;
 };

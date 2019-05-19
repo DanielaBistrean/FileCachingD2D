@@ -1,18 +1,18 @@
 #ifndef D2D_CFILESOURCE_H
 #define D2D_CFILESOURCE_H 1
 
-#include "../transfer/CFileCache.h"
 #include "../messages/DataPacket_m.h"
 
 #include "INode.h"
 #include "IProcessor.h"
 
 #include <omnetpp.h>
+#include "../transfer/CFileStore.h"
 
 class CFileSource : public IProcessor
 {
 public:
-    CFileSource (INode * pNode, CFileCache * pCache);
+    CFileSource (INode * pNode, CFileStore * pCache);
 
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
@@ -25,7 +25,7 @@ private:
 
 private:
     INode * m_pNode;
-    CFileCache * m_pCache;
+    CFileStore * m_pStore;
 };
 
 #endif // D2D_CFILESOURCE_H

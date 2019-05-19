@@ -32,7 +32,7 @@ void UE::initialize()
 
     if (getId () == 8)
     {
-        m_cache = CFileCache (true);
+        m_cache = CFileStore (true);
     }
 
     scheduleAt(simTime() + 1, new cMessage("test"));

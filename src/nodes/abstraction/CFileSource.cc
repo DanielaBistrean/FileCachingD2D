@@ -2,9 +2,9 @@
 
 #include "NetworkAbstraction.h"
 
-CFileSource::CFileSource (INode * pNode, CFileCache * pCache)
+CFileSource::CFileSource (INode * pNode, CFileStore * pCache)
 : m_pNode  {pNode}
-, m_pCache {pCache}
+, m_pStore {pCache}
 {}
 
 void
@@ -56,14 +56,14 @@ CFileSource::do_processRequest (DataPacket * pDataPacket)
     int fileId = pRequest->getFileId ();
     int startBlockId = pRequest->getStartBlockId ();
 
-    auto it = m_pCache->find (fileId);
-    if (it == m_pCache->end ())
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
     {
         EV_WARN << "No file found with id " << fileId << std::endl;
         return;
     }
 
-    CFile file = it->second.file;
+    CFile file = it->second;
     if (! file.hasBlock (startBlockId))
         return;
 
@@ -103,11 +103,11 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
     bool ack = pFeedback->getAck ();
     int nextBlockId = pFeedback->getNextBlockId ();
 
-    auto it = m_pCache->find (fileId);
-    if (it == m_pCache->end ())
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
         return;
 
-    CFile file = it->second.file;
+    CFile file = it->second;
 
     // TODO: rework branches
     if (! ack)
