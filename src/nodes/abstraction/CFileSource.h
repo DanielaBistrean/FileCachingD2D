@@ -21,7 +21,9 @@ private:
     void do_processRequest  (DataPacket * pDataPacket);
     void do_processFeedback (DataPacket * pDataPacket);
 
-    void do_RespondWithError (FileId fileId, int destId, int error);
+    void do_respondWithError (FileId fileId, int destId, int error);
+    void do_respondWithData (FileId fileId, int destId, int blockId);
+    void do_respondWithEOF (FileId, int destId);
 
 private:
     INode * m_pNode;

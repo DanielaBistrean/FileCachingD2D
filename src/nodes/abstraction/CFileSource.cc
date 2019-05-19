@@ -40,47 +40,21 @@ CFileSource::do_processRequest (DataPacket * pDataPacket)
 
     omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
     if (! pPacket)
-    {
-        EV_WARN << "Could not decapsulate packet" << std::endl;
         return;
-    }
 
     RequestDataPacket * pRequest = dynamic_cast <RequestDataPacket *> (pPacket);
 
     if (! pRequest)
-    {
-        EV_WARN << "Not a request packet. Something bad happened" << std::endl;
         return;
-    }
 
     int fileId = pRequest->getFileId ();
     int startBlockId = pRequest->getStartBlockId ();
 
     auto it = m_pStore->find (fileId);
-    if (it == m_pStore->end ())
-    {
-        EV_WARN << "No file found with id " << fileId << std::endl;
-        return;
-    }
-
-    CFile file = it->second;
-    if (! file.hasBlock (startBlockId))
-        return;
-
-    DataPacket * pResponse = new DataPacket ();
-
-    pResponse->setSourceId (dId);
-    pResponse->setDestinationId (sId);
-    pResponse->setType (DP_DATA);
-
-    FileDataPacket * pFileDataPacket = new FileDataPacket ();
-
-    pFileDataPacket->setFileId (fileId);
-    pFileDataPacket->setBlockId (startBlockId);
-
-    pResponse->encapsulate (pFileDataPacket);
-
-    m_pNode->sendOut (pResponse, sId);
+    if (it == m_pStore->end () || (! it->second.hasBlock (startBlockId)))
+        do_respondWithError(fileId, sId, DP_ERR_NOTFOUND);
+    else
+        do_respondWithData (fileId, sId, startBlockId);
 }
 
 void
@@ -109,80 +83,26 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
 
     CFile file = it->second;
 
-    // TODO: rework branches
-    if (! ack)
+    bool bInRange = NetworkAbstraction::getInstance ().isGateInRange(m_pNode->getNode ()->getId (), sId);
+
+    if (! file.hasBlock (blockId))
+        do_respondWithError(fileId, sId, DP_ERR_NOTFOUND);
+    else if (ack && (nextBlockId == -1 && (file.blocks() == (blockId + 1))))
+        do_respondWithEOF ();
+    else if (bInRange)
     {
-        if (! file.hasBlock (blockId))
-            return; // ERROR;
-
-        DataPacket * pResponse = new DataPacket ();
-
-        pResponse->setSourceId (dId);
-        pResponse->setDestinationId (sId);
-        pResponse->setType (DP_DATA);
-
-        FileDataPacket * pFileDataPacket = new FileDataPacket ();
-
-        pFileDataPacket->setFileId (fileId);
-        pFileDataPacket->setBlockId (blockId);
-
-        pResponse->encapsulate (pFileDataPacket);
-
-        m_pNode->sendOut (pResponse, sId);
+        if (ack)
+            // TODO: check if block is available
+            do_respondWithData (fileId, sId, (nextBlockId == -1) ? (blockId + 1) : nextBlockId);
+        else
+            do_respondWithData (fileId, sId, blockId);
     }
     else
-    {
-        if (nextBlockId == -1 && (file.blocks() == (blockId + 1)))
-        {
-            DataPacket * pResponse = new DataPacket ();
-
-            pResponse->setSourceId (dId);
-            pResponse->setDestinationId (sId);
-            pResponse->setType (DP_EOF);
-
-            EOFDataPacket * pEOFDataPacket = new EOFDataPacket ();
-            pEOFDataPacket->setFileId (fileId);
-
-            pResponse->encapsulate (pEOFDataPacket);
-
-            m_pNode->sendOut (pResponse, sId);
-        }
-        else
-        {
-            nextBlockId = (nextBlockId == -1) ? (blockId + 1) : nextBlockId;
-
-            if (! file.hasBlock (nextBlockId))
-            {
-                do_RespondWithError (fileId, sId, DP_ERR_NOTFOUND);
-                return;
-            }
-
-            if (! NetworkAbstraction::getInstance ().isGateInRange(m_pNode->getNode ()->getId (), sId))
-            {
-                do_RespondWithError (fileId, sId, DP_ERR_OUTOFRANGE);
-                return;
-            }
-
-            DataPacket * pResponse = new DataPacket ();
-
-            pResponse->setSourceId (dId);
-            pResponse->setDestinationId (sId);
-            pResponse->setType (DP_DATA);
-
-            FileDataPacket * pFileDataPacket = new FileDataPacket ();
-
-            pFileDataPacket->setFileId (fileId);
-            pFileDataPacket->setBlockId (nextBlockId);
-
-            pResponse->encapsulate(pFileDataPacket);
-
-            m_pNode->sendOut (pResponse, sId);
-        }
-    }
+        do_respondWithError (fileId, sId, DP_ERR_OUTOFRANGE);
 }
 
 void
-CFileSource::do_RespondWithError (FileId fileId, int destId, int error)
+CFileSource::do_respondWithError (FileId fileId, int destId, int error)
 {
     DataPacket * pResponse = new DataPacket ();
     pResponse->setSourceId (m_pNode->getNode ()->getId ());
@@ -198,3 +118,38 @@ CFileSource::do_RespondWithError (FileId fileId, int destId, int error)
     m_pNode->sendOut (pResponse, destId);
 }
 
+void
+CFileSource::do_respondWithData (FileId fileId, int destId, int blockId)
+{
+    DataPacket * pResponse = new DataPacket ();
+
+    pResponse->setSourceId (m_pNode->getNode ()->getId ());
+    pResponse->setDestinationId (destId);
+    pResponse->setType (DP_DATA);
+
+    FileDataPacket * pFileDataPacket = new FileDataPacket ();
+
+    pFileDataPacket->setFileId (fileId);
+    pFileDataPacket->setBlockId (blockId);
+
+    pResponse->encapsulate(pFileDataPacket);
+
+    m_pNode->sendOut (pResponse, destId);
+}
+
+void
+CFileSource::do_respondWithEOF (FileId, int destId)
+{
+    DataPacket * pResponse = new DataPacket ();
+
+    pResponse->setSourceId (m_pNode->getNode ()->getId ());
+    pResponse->setDestinationId (destId);
+    pResponse->setType (DP_EOF);
+
+    EOFDataPacket * pEOFDataPacket = new EOFDataPacket ();
+    pEOFDataPacket->setFileId (fileId);
+
+    pResponse->encapsulate (pEOFDataPacket);
+
+    m_pNode->sendOut (pResponse, destId);
+}
