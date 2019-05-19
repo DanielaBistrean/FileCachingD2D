@@ -40,21 +40,8 @@ CFileSink::requestFile (FileId fileId, int nodeId)
     if (nodeId == -1)
         nodeId = NetworkAbstraction::getInstance ().getBaseId ();
 
-    DataPacket * pResponse = new DataPacket ();
-
-    pResponse->setSourceId (m_pNode->getNode ()->getId());
-    pResponse->setDestinationId (nodeId);
-    pResponse->setType (DP_REQ);
-
-    RequestDataPacket * pRequestDataPacket = new RequestDataPacket ();
-
-    pRequestDataPacket->setFileId (fileId);
-    pRequestDataPacket->setStartBlockId (0);
-
-    pResponse->encapsulate (pRequestDataPacket);
-
     m_bDownloading = true;
-    m_pNode->sendOut (pResponse, nodeId);
+    do_sendFileRequest(fileId, nodeId, 0);
 }
 
 void
@@ -63,10 +50,7 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
     EV_STATICCONTEXT
 
     if (! m_bDownloading)
-    {
-        EV_ERROR << "Not downloading. Ignoring..." << std::endl;
         return;
-    }
 
     auto sId = pDataPacket->getSourceId ();
     auto dId = pDataPacket->getDestinationId ();
@@ -75,22 +59,17 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
 
     omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
     if (! pPacket)
-    {
-        EV_WARN << "Could not decapsulate packet" << std::endl;
         return;
-    }
 
     FileDataPacket * pData = dynamic_cast <FileDataPacket *> (pPacket);
 
     if (! pData)
-    {
-        EV_WARN << "Not a payload packet. Something bad happened" << std::endl;
         return;
-    }
 
     int fileId = pData->getFileId ();
     int blockId = pData->getBlockId ();
 
+    // TODO: handle errors
     auto it = m_pStore->find (fileId);
     if (it == m_pStore->end ())
     {
@@ -108,22 +87,47 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
 
     file.setBlock (blockId);
 
+    do_sendFileFeedback(fileId, sId, blockId, true, -1);
+}
+
+void
+CFileSink::do_sendFileRequest (FileId fileId, int destId, int startBlockId)
+{
     DataPacket * pResponse = new DataPacket ();
 
-    pResponse->setSourceId (dId);
-    pResponse->setDestinationId (sId);
+    pResponse->setSourceId (m_pNode->getNode ()->getId());
+    pResponse->setDestinationId (destId);
+    pResponse->setType (DP_REQ);
+
+    RequestDataPacket * pRequestDataPacket = new RequestDataPacket ();
+
+    pRequestDataPacket->setFileId (fileId);
+    pRequestDataPacket->setStartBlockId (startBlockId);
+
+    pResponse->encapsulate (pRequestDataPacket);
+
+    m_pNode->sendOut (pResponse, destId);
+}
+
+void
+CFileSink::do_sendFileFeedback (FileId fileId, int destId, int blockId, bool ack, int nextBlockId)
+{
+    DataPacket * pResponse = new DataPacket ();
+
+    pResponse->setSourceId (m_pNode->getNode ()->getId());
+    pResponse->setDestinationId (destId);
     pResponse->setType (DP_FEEDBACK);
 
     FeedbackDataPacket * pFeedbackDataPacket = new FeedbackDataPacket ();
 
     pFeedbackDataPacket->setFileId (fileId);
     pFeedbackDataPacket->setBlockId (blockId);
-    pFeedbackDataPacket->setAck (true);
-    pFeedbackDataPacket->setNextBlockId (-1);
+    pFeedbackDataPacket->setAck (ack);
+    pFeedbackDataPacket->setNextBlockId (nextBlockId);
 
     pResponse->encapsulate (pFeedbackDataPacket);
 
-    m_pNode->sendOut (pResponse, sId);
+    m_pNode->sendOut (pResponse, destId);
 }
 
 void

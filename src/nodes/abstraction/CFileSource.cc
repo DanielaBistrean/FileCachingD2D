@@ -88,7 +88,7 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
     if (! file.hasBlock (blockId))
         do_respondWithError(fileId, sId, DP_ERR_NOTFOUND);
     else if (ack && (nextBlockId == -1 && (file.blocks() == (blockId + 1))))
-        do_respondWithEOF ();
+        do_respondWithEOF (fileId, sId);
     else if (bInRange)
     {
         if (ack)
@@ -138,7 +138,7 @@ CFileSource::do_respondWithData (FileId fileId, int destId, int blockId)
 }
 
 void
-CFileSource::do_respondWithEOF (FileId, int destId)
+CFileSource::do_respondWithEOF (FileId fileId, int destId)
 {
     DataPacket * pResponse = new DataPacket ();
 

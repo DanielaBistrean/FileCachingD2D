@@ -27,6 +27,9 @@ private:
     void do_processEOF   (DataPacket * pDataPacket);
     void do_processError (DataPacket * pDataPacket);
 
+    void do_sendFileRequest (FileId fileId, int destId, int startBlockId);
+    void do_sendFileFeedback (FileId fileId, int destId, int blockId, bool ack, int nextBlockId);
+
 private:
     INode * m_pNode;
     CFileStore * m_pStore;
