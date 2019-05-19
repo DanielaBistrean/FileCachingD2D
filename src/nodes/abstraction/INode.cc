@@ -10,7 +10,7 @@ void INode::sendInternal (omnetpp::cMessage * pMsg, omnetpp::simtime_t offset)
 void INode::sendOut (omnetpp::cMessage * pMsg, int nodeId)
 {
     cGate * out = NetworkAbstraction::getInstance ().getNodeGate (nodeId);
-    getNode ()->sendDirect(pMsg, 0.05, 0.0025, out);
+    getNode ()->sendDirect(pMsg, 0.005, 0.0025, out);
 }
 
 void INode::sendBroadcast (omnetpp::cMessage * pMsg)
@@ -20,6 +20,6 @@ void INode::sendBroadcast (omnetpp::cMessage * pMsg)
     for (auto & gate : gates)
     {
         cMessage *tmp = pMsg->dup ();
-        getNode ()->sendDirect (tmp, 0.05, 0.0025, gate);
+        getNode ()->sendDirect (tmp, 0.005, 0.0025, gate);
     }
 }
