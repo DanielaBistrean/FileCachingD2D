@@ -171,6 +171,19 @@ CCacheManager::getNumBlocks (FileId fileId)
 }
 
 int
+CCacheManager::getFirstMissingBlock (FileId fileId, int startBlockId)
+{
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
+        return -1;
+
+    for (std::size_t i = startBlockId; i < it->second.blocks (); ++i)
+        if (! it->second.hasBlock (i)) return i;
+
+    return -1;
+}
+
+int
 CCacheManager::do_findCacheEntry (FileId fileId)
 {
     for (std::size_t i = 0; i < m_cache.size (); ++i)

@@ -179,6 +179,10 @@ CNetworkManager::requestFile (FileId fileId)
 {
     EV_STATICCONTEXT
 
+    int startBlockId = m_pCacheManager->getFirstMissingBlock (fileId);
+    if (startBlockId < 0)
+        return;
+
     m_enquires [fileId] = {};
 
     ControlPacket * pResponse = new ControlPacket ();
@@ -188,7 +192,7 @@ CNetworkManager::requestFile (FileId fileId)
 
     BroadcastControlPacket * pBroadcast = new BroadcastControlPacket ();
     pBroadcast->setFileId (fileId);
-    pBroadcast->setStartBlockId (0); // TODO: check first missing block
+    pBroadcast->setStartBlockId (startBlockId);
 
     pResponse->encapsulate (pBroadcast);
 

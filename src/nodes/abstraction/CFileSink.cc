@@ -86,8 +86,9 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
     }
 
     m_pCache->setFileData(fileId, blockId);
+    int nextBlockId = m_pCache->getFirstMissingBlock(fileId);
 
-    do_sendFileFeedback(fileId, sId, blockId, true, -1);
+    do_sendFileFeedback(fileId, sId, blockId, true, nextBlockId);
 }
 
 void
@@ -150,7 +151,6 @@ CFileSink::do_processError (DataPacket * pDataPacket)
 
     m_bRequery = true;
 
-    // TODO: check also block id?
     FileId fileId = pError->getFileId ();
 
     UENotification * pNotification = new UENotification ();

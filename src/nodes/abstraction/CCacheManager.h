@@ -75,6 +75,7 @@ public:
     bool isValidBlock (FileId fileId, int blockId);
 
     int  getNumBlocks (FileId fileId);
+    int  getFirstMissingBlock (FileId fileId, int startBlockId = 0);
 
     CacheState getCacheState (FileId fileId);
     void setCacheState (FileId fileId, CacheState state);
