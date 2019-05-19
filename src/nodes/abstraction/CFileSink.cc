@@ -1,6 +1,7 @@
 #include "CFileSink.h"
 
 #include "NetworkAbstraction.h"
+#include "../messages/UENotification_m.h"
 
 CFileSink::CFileSink (INode * pNode, CCacheManager * pCache)
 : m_pNode  {pNode}
@@ -136,5 +137,21 @@ CFileSink::do_processEOF (DataPacket * pDataPacket)
 void
 CFileSink::do_processError (DataPacket * pDataPacket)
 {
-    m_bDownloading = false;
+    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    if (! pPacket)
+        return;
+
+    ErrorDataPacket * pError = dynamic_cast <ErrorDataPacket*> (pPacket);
+
+    if (! pError)
+        return;
+
+    // TODO: check also block id?
+    FileId fileId = pError->getFileId ();
+
+    UENotification * pNotification = new UENotification ();
+    pNotification->setFileId (fileId);
+    pNotification->setType(N_REQUERY);
+
+    m_pNode->sendInternal(pNotification, 0);
 }

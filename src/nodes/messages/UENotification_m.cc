@@ -182,6 +182,7 @@ EXECUTE_ON_STARTUP(
     if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("NotificationType"));
     e->insert(N_SCHEDULE, "N_SCHEDULE");
     e->insert(N_TIMEOUT, "N_TIMEOUT");
+    e->insert(N_REQUERY, "N_REQUERY");
 )
 
 Register_Class(UENotification)

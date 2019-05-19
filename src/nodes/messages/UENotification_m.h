@@ -25,16 +25,18 @@
  * {
  *     N_SCHEDULE = 0;
  *     N_TIMEOUT = 1;
+ *     N_REQUERY = 2;
  * }
  * </pre>
  */
 enum NotificationType {
     N_SCHEDULE = 0,
-    N_TIMEOUT = 1
+    N_TIMEOUT = 1,
+    N_REQUERY = 2
 };
 
 /**
- * Class generated from <tt>nodes/messages/UENotification.msg:23</tt> by nedtool.
+ * Class generated from <tt>nodes/messages/UENotification.msg:24</tt> by nedtool.
  * <pre>
  * message UENotification
  * {

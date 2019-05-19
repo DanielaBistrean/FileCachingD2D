@@ -42,7 +42,8 @@ private:
     void do_processBroadcast    (ControlPacket * pDataPacket);
 
     void do_scheduleTimeout (FileId fileId);
-    void do_processTimeout (FileId fileId);
+    void do_processTimeout  (FileId fileId);
+    void do_processRequery  (FileId fileId);
 
 public:
     void requestFile (FileId fileId);

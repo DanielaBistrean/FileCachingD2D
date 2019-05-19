@@ -66,11 +66,18 @@ CNetworkManager::do_processSelfMessages (omnetpp::cMessage * pSelfMessage)
     case N_TIMEOUT:
         do_processTimeout (fileId);
         break;
+    case N_REQUERY:
+        do_processRequery (fileId);
     default:
         break;
     }
 }
 
+void
+CNetworkManager::do_processRequery (FileId fileId)
+{
+    requestFile (fileId);
+}
 
 void
 CNetworkManager::do_processConfirmation (ControlPacket * pControlPacket)
