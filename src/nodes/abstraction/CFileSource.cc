@@ -1,5 +1,7 @@
 #include "CFileSource.h"
 
+#include "NetworkAbstraction.h"
+
 CFileSource::CFileSource (INode * pNode, CFileCache * pCache)
 : m_pNode  {pNode}
 , m_pCache {pCache}
@@ -107,6 +109,7 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
 
     CFile file = it->second.file;
 
+    // TODO: rework branches
     if (! ack)
     {
         if (! file.hasBlock (blockId))
@@ -149,7 +152,16 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
             nextBlockId = (nextBlockId == -1) ? (blockId + 1) : nextBlockId;
 
             if (! file.hasBlock (nextBlockId))
-                return; // ERROR
+            {
+                do_RespondWithError (fileId, sId, DP_ERR_NOTFOUND);
+                return;
+            }
+
+            if (! NetworkAbstraction::getInstance ().isGateInRange(m_pNode->getNode ()->getId (), sId))
+            {
+                do_RespondWithError (fileId, sId, DP_ERR_OUTOFRANGE);
+                return;
+            }
 
             DataPacket * pResponse = new DataPacket ();
 
@@ -167,5 +179,22 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
             m_pNode->sendOut (pResponse, sId);
         }
     }
+}
+
+void
+CFileSource::do_RespondWithError (FileId fileId, int destId, int error)
+{
+    DataPacket * pResponse = new DataPacket ();
+    pResponse->setSourceId (m_pNode->getNode ()->getId ());
+    pResponse->setDestinationId (destId);
+    pResponse->setType (DP_ERROR);
+
+    ErrorDataPacket * pError = new ErrorDataPacket ();
+    pError->setFileId (fileId);
+    pError->setError(error);
+
+    pResponse->encapsulate (pError);
+
+    m_pNode->sendOut (pResponse, destId);
 }
 

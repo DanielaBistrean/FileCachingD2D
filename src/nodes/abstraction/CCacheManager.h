@@ -66,8 +66,6 @@ private:
     INode * m_pNode;
     CFileSink * m_pFileSink;
 
-    bool m_bDownloading;
-
     CFileCache * m_pCache;
     std::map <FileId, std::priority_queue <ConfirmationData> > m_enquires;
 };

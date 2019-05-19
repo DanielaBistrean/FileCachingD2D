@@ -5,6 +5,7 @@
 CFileSink::CFileSink (INode * pNode, CFileCache * pCache)
 : m_pNode  {pNode}
 , m_pCache {pCache}
+, m_bDownloading {false}
 {}
 
 void
@@ -23,6 +24,8 @@ CFileSink::process (omnetpp::cMessage * pMsg)
     case DP_EOF:
         do_processEOF (pDataPacket);
         break;
+    case DP_ERROR:
+        do_processError (pDataPacket);
     default:
         break;
     }
@@ -31,6 +34,9 @@ CFileSink::process (omnetpp::cMessage * pMsg)
 void
 CFileSink::requestFile (FileId fileId, int nodeId)
 {
+    if (m_bDownloading)
+        return;
+
     if (nodeId == -1)
         nodeId = NetworkAbstraction::getInstance ().getBaseId ();
 
@@ -47,6 +53,7 @@ CFileSink::requestFile (FileId fileId, int nodeId)
 
     pResponse->encapsulate (pRequestDataPacket);
 
+    m_bDownloading = true;
     m_pNode->sendOut (pResponse, nodeId);
 }
 
@@ -54,6 +61,12 @@ void
 CFileSink::do_processData  (DataPacket * pDataPacket)
 {
     EV_STATICCONTEXT
+
+    if (! m_bDownloading)
+    {
+        EV_ERROR << "Not downloading. Ignoring..." << std::endl;
+        return;
+    }
 
     auto sId = pDataPacket->getSourceId ();
     auto dId = pDataPacket->getDestinationId ();
@@ -115,4 +128,12 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
 
 void
 CFileSink::do_processEOF (DataPacket * pDataPacket)
-{}
+{
+    m_bDownloading = false;
+}
+
+void
+CFileSink::do_processError (DataPacket * pDataPacket)
+{
+    m_bDownloading = false;
+}

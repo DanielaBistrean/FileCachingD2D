@@ -22,7 +22,6 @@
 CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink, CFileCache * pCache)
 : m_pNode {pNode}
 , m_pFileSink {pFileSink}
-, m_bDownloading {false}
 , m_pCache {pCache}
 {
     int numFiles = CGlobalConfiguration::getInstance ().get ("numFiles");
@@ -112,7 +111,6 @@ CCacheManager::do_processTimeout (FileId fileId)
 
     auto queue = it->second;
     m_pCache->setCacheState(fileId, DOWNLOADING);
-    m_bDownloading = true;
 
     if (queue.empty ())
     {
@@ -130,7 +128,9 @@ CCacheManager::do_processTimeout (FileId fileId)
 void
 CCacheManager::do_prepareEnquiry ()
 {
-    if (m_bDownloading)
+    EV_STATICCONTEXT
+
+    if (m_pFileSink->isDownloading ())
     {
         do_scheduleNextEnquiry ();
         return;
@@ -163,6 +163,8 @@ CCacheManager::do_prepareEnquiry ()
     pResponse->encapsulate (pBroadcast);
 
     m_pNode->sendBroadcast(pResponse);
+
+    EV << "Sending broadcast for file " << fileId << std::endl;
 
     do_scheduleTimeout (fileId);
     do_scheduleNextEnquiry ();

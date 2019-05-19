@@ -20,13 +20,18 @@ public:
 public:
     void requestFile (FileId fileId, int nodeId = -1);
 
+    bool isDownloading () { return m_bDownloading; };
+
 private:
     void do_processData  (DataPacket * pDataPacket);
-    void do_processEOF (DataPacket * pDataPacket);
+    void do_processEOF   (DataPacket * pDataPacket);
+    void do_processError (DataPacket * pDataPacket);
 
 private:
     INode * m_pNode;
     CFileCache * m_pCache;
+
+    bool m_bDownloading;
 };
 
 #endif // D2D_CFILESINK_H

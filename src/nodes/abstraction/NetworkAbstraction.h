@@ -44,6 +44,10 @@ public:
 
 public:
     std::vector <cGate *> getBroadcastGates (int senderId);
+    bool isGateInRange (int senderId, int destinationId);
+
+private:
+    double do_computeDistance (UE * user1, UE * user2);
 
 private:
     NetworkAbstraction () : m_base {nullptr} {};
@@ -51,6 +55,8 @@ private:
 private:
     std::map <int, UE *> m_users;
     gNB * m_base;
+
+    static double s_maxD2DRange;
 };
 
 #endif /* NODES_ABSTRACTION_NETWORKABSTRACTION_H_ */

@@ -21,6 +21,8 @@ private:
     void do_processRequest  (DataPacket * pDataPacket);
     void do_processFeedback (DataPacket * pDataPacket);
 
+    void do_RespondWithError (FileId fileId, int destId, int error);
+
 private:
     INode * m_pNode;
     CFileCache * m_pCache;
