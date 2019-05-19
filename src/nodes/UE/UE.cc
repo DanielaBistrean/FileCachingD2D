@@ -34,11 +34,10 @@ void UE::initialize()
     {
         m_cache = CFileStore (true);
     }
-
-    scheduleAt(simTime() + 1, new cMessage("test"));
 }
 
 void UE::handleMessage(cMessage *msg)
+try
 {
     m_pMainLoop->process       (msg);
     m_pMobility->process       (msg);
@@ -48,6 +47,11 @@ void UE::handleMessage(cMessage *msg)
     m_pNetworkManager->process (msg);
 
     delete msg;
+}
+catch (std::exception &e)
+{
+    EV_ERROR << e.what () << std::endl;
+    EV_ERROR << msg->getName () << std::endl;
 }
 
 void UE::finish()
