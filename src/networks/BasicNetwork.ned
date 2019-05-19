@@ -21,8 +21,8 @@ import filecachingd2d.nodes.gNB.*;
 network BasicNetwork
 {
     parameters:
-        int numNodes = default (10);
-		int numFiles = default (17);
+        int numNodes = default (15);
+		int numFiles = default (20);
 
         double radius = default(406);
         double cx = default(radius + 182);
