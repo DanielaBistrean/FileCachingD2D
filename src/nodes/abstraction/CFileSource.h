@@ -9,6 +9,8 @@
 
 #include <omnetpp.h>
 
+using namespace omnetpp;
+
 class CFileSource : public IProcessor
 {
 public:
@@ -28,6 +30,9 @@ private:
 private:
     INode * m_pNode;
     CCacheManager * m_pCache;
+
+    simsignal_t m_signalD2D;
+    simsignal_t m_signalD2I;
 };
 
 #endif // D2D_CFILESOURCE_H

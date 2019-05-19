@@ -34,3 +34,6 @@
 # OMNet++
 out
 src/FileCachingD2D*
+.computed
+.cmdenv-log
+simulations/results

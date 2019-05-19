@@ -5,7 +5,10 @@
 CFileSource::CFileSource (INode * pNode, CCacheManager * pCache)
 : m_pNode  {pNode}
 , m_pCache {pCache}
-{}
+{
+    m_signalD2D = cSimpleModule::registerSignal("d2d");
+    m_signalD2I = cSimpleModule::registerSignal("d2i");
+}
 
 void
 CFileSource::process (omnetpp::cMessage * pMsg)
@@ -117,6 +120,11 @@ CFileSource::do_respondWithError (FileId fileId, int destId, int error)
 void
 CFileSource::do_respondWithData (FileId fileId, int destId, int blockId)
 {
+    if (m_pNode->getNode ()->getId () == NetworkAbstraction::getInstance ().getBaseId ())
+        m_pNode->getNode ()->emit (m_signalD2I, 1);
+    else
+        m_pNode->getNode ()->emit (m_signalD2D, 1);
+
     DataPacket * pResponse = new DataPacket ();
 
     pResponse->setSourceId (m_pNode->getNode ()->getId ());

@@ -31,13 +31,18 @@ network BasicNetwork
         double velocityMax = default(5);
 
         double updateInterval = default(1000); //1000ms
-        double D2DMaxRange = default(200);
+        double D2DMaxRange = default(100);
         
         double D2DEnquiryTimeout = default (0.5);
         
         double cacheLimit = default (0.5); // cache keeps half of the files
 
         @display("bgb=1176,812;bgi=background/streetmap,s");
+        
+        @signal[d2d](type=long);
+		@statistic[d2d](record = vector, sum);
+		@signal[d2i](type=long);
+        @statistic[d2i](record = vector, sum);
 
     submodules:
         n [numNodes] : UE;
