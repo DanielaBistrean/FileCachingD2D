@@ -35,27 +35,31 @@ struct FileInfo
 enum CacheState
 {
     ERROR = -2,
-    ENQUIRY = -1,
     NOTPRESENT = 0,
-    DOWNLOADING = 1,
-    FULL = 2
+    FULL = 1,
+    DOWNLOADING = 3, // reason: downloading files have high priority
+    ENQUIRY = 4,
 };
 
 struct CacheData
 {
     CacheState state;
-    int score;
+    float score;
 
     CacheData (bool available = false)
-    : state {available ? FULL : NOTPRESENT}, score {1} {};
-
-    friend bool operator<  (const CacheData &lhs, const CacheData &rhs);
-    friend bool operator== (const CacheData &lhs, const CacheData &rhs);
+    : state {available ? FULL : NOTPRESENT}, score {1.0f} {};
 };
 
 using CacheEntry = std::pair <FileId, CacheData>;
 bool operator<  (const CacheEntry &lhs, const CacheEntry &rhs);
 bool operator== (const CacheEntry &lhs, const CacheEntry &rhs);
+
+constexpr
+bool
+sortEntries (const CacheEntry &lhs, const CacheEntry &rhs)
+{
+    return (lhs.second.score * float (lhs.second.state)) < (rhs.second.score * float (rhs.second.state));
+}
 
 class CCacheManager : public IProcessor
 {
@@ -80,10 +84,13 @@ public:
     CacheState getCacheState (FileId fileId);
     void setCacheState (FileId fileId, CacheState state);
 
+    void updateCacheCounter (FileId fileId);
+
 private:
     void do_processSelfMessages (omnetpp::cMessage * pSelfMessage);
 
 private:
+    void do_computeCache ();
     void do_recalculatePriorities ();
 
     int do_findCacheEntry (FileId fileId);

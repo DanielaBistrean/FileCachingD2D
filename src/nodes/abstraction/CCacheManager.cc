@@ -49,9 +49,50 @@ CCacheManager::do_processSelfMessages (omnetpp::cMessage * pSelfMessage)
 
     switch (pNotification->getType ())
     {
+    case N_RECACHE:
+        do_computeCache ();
+        break;
     default:
         break;
     }
+}
+
+void
+CCacheManager::do_computeCache ()
+{
+    EV_STATICCONTEXT
+    do_recalculatePriorities ();
+
+    static double cacheLimit = CGlobalConfiguration::getInstance ().get ("cacheLimit");
+    std::size_t limit = m_cache.size () * cacheLimit;
+
+    EV << "----------------------------------------------------------------------\n";
+    EV << '\n';
+    EV << "    RECACHING IN PROGRESS WITH LIMIT: " << limit << "\n";
+    EV << '\n';
+    EV << "----------------------------------------------------------------------\n";
+    EV << '\n';
+    for (std::size_t i = 0; i < m_cache.size (); ++i)
+    {
+        double score = m_cache [i].second.score * (float) m_cache [i].second.state;
+        EV << "    " << m_cache [i].first << "\t[" << score << "] => SCORE: " << m_cache [i].second.score << "; STATE=" << m_cache [i].second.state << '\n';
+    }
+    EV << '\n';
+    for (std::size_t i = 0; i < limit; ++i)
+    {
+        m_cache [i].second.state = NOTPRESENT;
+        m_pStore->removeFile (m_cache [i].first);
+    }
+    EV << '\n';
+    for (std::size_t i = 0; i < m_cache.size (); ++i)
+    {
+        double score = m_cache [i].second.score * (float) m_cache [i].second.state;
+        EV << "    " << m_cache [i].first << "\t[" << score << "] => SCORE: " << m_cache [i].second.score << "; STATE=" << m_cache [i].second.state << '\n';
+    }
+    EV << '\n';
+    EV << '\n';
+    EV << '\n';
+    EV << "----------------------------------------------------------------------\n";
 }
 
 bool
@@ -81,7 +122,15 @@ CCacheManager::selectFileForDownload (FileId &fileId)
 void
 CCacheManager::do_recalculatePriorities ()
 {
+    // Perform normalization of scores
+//    float maxScore = 0.0f;
+//    for (auto & entry : m_cache)
+//        if (entry.second.score > maxScore) maxScore = entry.second.score;
+//
+//    for (auto & entry : m_cache)
+//        entry.second.score /= maxScore;
 
+    std::sort (m_cache.begin(), m_cache.end (), sortEntries);
 }
 
 bool
@@ -183,6 +232,16 @@ CCacheManager::getFirstMissingBlock (FileId fileId, int startBlockId)
     return -1;
 }
 
+void
+CCacheManager::updateCacheCounter (FileId fileId)
+{
+    std::size_t idx = do_findCacheEntry (fileId);
+    if (idx < 0)
+        return;
+
+    m_cache [idx].second.score ++;
+}
+
 int
 CCacheManager::do_findCacheEntry (FileId fileId)
 {
@@ -191,10 +250,3 @@ CCacheManager::do_findCacheEntry (FileId fileId)
 
     return -1;
 }
-
-bool
-operator< (const CacheData &lhs, const CacheData &rhs)
-{
-    return (lhs.score * lhs.state) < (rhs.score * lhs.state);
-}
-

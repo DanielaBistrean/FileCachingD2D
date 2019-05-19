@@ -183,6 +183,7 @@ EXECUTE_ON_STARTUP(
     e->insert(N_SCHEDULE, "N_SCHEDULE");
     e->insert(N_TIMEOUT, "N_TIMEOUT");
     e->insert(N_REQUERY, "N_REQUERY");
+    e->insert(N_RECACHE, "N_RECACHE");
 )
 
 Register_Class(UENotification)

@@ -42,8 +42,11 @@ CFileSink::requestFile (FileId fileId, int nodeId)
     if (nodeId == -1)
         nodeId = NetworkAbstraction::getInstance ().getBaseId ();
 
+    m_pCache->setCacheState (fileId, DOWNLOADING);
+
     m_bDownloading = true;
     m_bRequery = false;
+
     do_sendFileRequest(fileId, nodeId, 0);
 }
 
@@ -134,7 +137,17 @@ CFileSink::do_sendFileFeedback (FileId fileId, int destId, int blockId, bool ack
 void
 CFileSink::do_processEOF (DataPacket * pDataPacket)
 {
+    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    if (! pPacket)
+        return;
+
+    EOFDataPacket * pEOF = dynamic_cast <EOFDataPacket *> (pPacket);
+
+    if (! pEOF)
+        return;
+
     m_bDownloading = false;
+    m_pCache->setCacheState(pEOF->getFileId (), FULL);
 }
 
 void

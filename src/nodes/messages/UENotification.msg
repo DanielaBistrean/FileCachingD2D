@@ -18,6 +18,7 @@ enum NotificationType
     N_SCHEDULE = 0;
     N_TIMEOUT = 1;
     N_REQUERY = 2;
+    N_RECACHE = 3;
 }
 
 message UENotification

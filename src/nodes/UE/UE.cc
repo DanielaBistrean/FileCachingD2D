@@ -29,11 +29,6 @@ void UE::initialize()
     m_pFileSource     = std::unique_ptr <CFileSource>     (new CFileSource     (this, m_pCacheManager.get ()));
     m_pNetworkManager = std::unique_ptr <CNetworkManager> (new CNetworkManager (this, m_pFileSink.get (), m_pCacheManager.get ()));
     m_pMainLoop       = std::unique_ptr <CMainLoop>       (new CMainLoop       (this, m_pCacheManager.get (), m_pNetworkManager.get ()));
-
-    if (getId () == 8)
-    {
-        m_cache = CFileStore (true);
-    }
 }
 
 void UE::handleMessage(cMessage *msg)

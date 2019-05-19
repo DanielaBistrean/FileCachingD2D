@@ -10,3 +10,13 @@ CFileStore::CFileStore (bool available)
         insert({id, CFile (16000, available)});
     }
 }
+
+void
+CFileStore::removeFile (FileId fileId)
+{
+    auto it = find (fileId);
+    if (it == end ())
+        return;
+
+    it->second.unsetAll ();
+}

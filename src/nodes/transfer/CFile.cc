@@ -27,6 +27,13 @@ CFile::unsetBlock (std::size_t index)
     m_blocks.at (index) = false;
 }
 
+void
+CFile::unsetAll ()
+{
+    std::size_t size = m_blocks.size ();
+    m_blocks = std::vector <bool> (size, false);
+}
+
 std::size_t
 CFile::available ()
 {

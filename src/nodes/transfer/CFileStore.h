@@ -10,6 +10,8 @@ class CFileStore : public std::unordered_map <FileId, CFile>
 {
 public:
     CFileStore (bool available = false);
+
+    void removeFile (FileId fileId);
 };
 
 #endif // D2D_CFILECACHE_H

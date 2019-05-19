@@ -14,6 +14,7 @@ public:
     bool hasBlock   (std::size_t index);
     void setBlock   (std::size_t index);
     void unsetBlock (std::size_t index);
+    void unsetAll   ();
 
 public:
     std::size_t size   () { return m_bytes;          };

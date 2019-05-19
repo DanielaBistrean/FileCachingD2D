@@ -34,6 +34,8 @@ network BasicNetwork
         double D2DMaxRange = default(200);
         
         double D2DEnquiryTimeout = default (0.5);
+        
+        double cacheLimit = default (0.5); // cache keeps half of the files
 
         @display("bgb=1176,812;bgi=background/streetmap,s");
 

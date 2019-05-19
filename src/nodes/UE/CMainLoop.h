@@ -33,6 +33,8 @@ private:
     void do_attemptFileDownload ();
     void do_scheduleNextAttempt ();
 
+    void do_scheduleNextRecache ();
+
 
 private:
     INode * m_pNode;

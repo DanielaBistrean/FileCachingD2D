@@ -22,8 +22,10 @@ CMainLoop::CMainLoop(INode * pNode, CCacheManager * pCacheManager, CNetworkManag
 , m_pCacheManager   {pCacheManager}
 , m_pNetworkManager {pNetworkManager}
 {
-    if (m_pNode->getNode ()->getId () == 2)
-        do_scheduleNextAttempt ();
+//    if (m_pNode->getNode ()->getId () == 2)
+
+    do_scheduleNextAttempt ();
+    do_scheduleNextRecache ();
 }
 
 void
@@ -42,6 +44,8 @@ CMainLoop::process (omnetpp::cMessage * pMsg)
     case N_SCHEDULE:
         do_attemptFileDownload ();
         break;
+    case N_RECACHE:
+        do_scheduleNextRecache ();
     default:
         break;
     }
@@ -62,6 +66,18 @@ CMainLoop::do_scheduleNextAttempt ()
 {
     UENotification * pNotification = new UENotification ();
     pNotification->setType (N_SCHEDULE);
+
+    omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
+
+    // New schedule can be in interval [10, 20).
+    m_pNode->sendInternal (pNotification, 10 + (random->doubleRand () * 10));
+}
+
+void
+CMainLoop::do_scheduleNextRecache ()
+{
+    UENotification * pNotification = new UENotification ();
+    pNotification->setType (N_RECACHE);
 
     omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
 

@@ -156,6 +156,8 @@ CNetworkManager::do_processBroadcast (ControlPacket * pControlPacket)
     if (! bAvailable)
         return;
 
+    m_pCacheManager->updateCacheCounter (fileId);
+
     auto it = std::find (fileInfo.availableBlocks.begin(), fileInfo.availableBlocks.end(), startBlockId);
     if (it == fileInfo.availableBlocks.end ())
         return;
@@ -184,6 +186,7 @@ CNetworkManager::requestFile (FileId fileId)
         return;
 
     m_enquires [fileId] = {};
+    m_pCacheManager->setCacheState (fileId, ENQUIRY);
 
     ControlPacket * pResponse = new ControlPacket ();
     pResponse->setSourceId (m_pNode->getNode ()->getId ());
