@@ -40,15 +40,10 @@ CCacheManager::process (omnetpp::cMessage * pMsg)
 void
 CCacheManager::do_processSelfMessages (omnetpp::cMessage * pSelfMessage)
 {
-    EV_STATICCONTEXT
-
     UENotification * pNotification = dynamic_cast <UENotification *> (pSelfMessage);
 
     if (! pNotification)
-    {
-        EV_WARN << "Not a UE notification. Ignoring" << std::endl;
         return;
-    }
 
     FileId fileId = pNotification->getFileId ();
 
@@ -62,7 +57,7 @@ CCacheManager::do_processSelfMessages (omnetpp::cMessage * pSelfMessage)
 bool
 CCacheManager::selectFileForDownload (FileId &fileId)
 {
-    EV_STATICCONTEXT
+//    EV_STATICCONTEXT
 
 //    if (m_pFileSink->isDownloading ())
 //        return false;

@@ -7,6 +7,7 @@ CFileSink::CFileSink (INode * pNode, CCacheManager * pCache)
 : m_pNode  {pNode}
 , m_pCache {pCache}
 , m_bDownloading {false}
+, m_bRequery {false}
 {}
 
 void
@@ -35,13 +36,14 @@ CFileSink::process (omnetpp::cMessage * pMsg)
 void
 CFileSink::requestFile (FileId fileId, int nodeId)
 {
-    if (m_bDownloading)
+    if (m_bDownloading && ! m_bRequery)
         return;
 
     if (nodeId == -1)
         nodeId = NetworkAbstraction::getInstance ().getBaseId ();
 
     m_bDownloading = true;
+    m_bRequery = false;
     do_sendFileRequest(fileId, nodeId, 0);
 }
 
@@ -145,6 +147,8 @@ CFileSink::do_processError (DataPacket * pDataPacket)
 
     if (! pError)
         return;
+
+    m_bRequery = true;
 
     // TODO: check also block id?
     FileId fileId = pError->getFileId ();

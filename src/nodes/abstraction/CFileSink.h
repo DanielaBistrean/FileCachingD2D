@@ -37,6 +37,7 @@ private:
     CCacheManager * m_pCache;
 
     bool m_bDownloading;
+    bool m_bRequery;
 };
 
 #endif // D2D_CFILESINK_H
