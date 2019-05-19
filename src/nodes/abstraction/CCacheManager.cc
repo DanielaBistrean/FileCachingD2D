@@ -19,9 +19,8 @@
 #include "../messages/UENotification_m.h"
 #include "../../configuration/CGlobalConfiguration.h"
 
-CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink, CFileStore * pStore)
+CCacheManager::CCacheManager(INode * pNode, CFileStore * pStore)
 : m_pNode {pNode}
-, m_pFileSink {pFileSink}
 , m_pStore {pStore}
 {
     for (auto & file : *m_pStore)
@@ -65,8 +64,8 @@ CCacheManager::selectFileForDownload (FileId &fileId)
 {
     EV_STATICCONTEXT
 
-    if (m_pFileSink->isDownloading ())
-        return false;
+//    if (m_pFileSink->isDownloading ())
+//        return false;
 
     omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
 
@@ -127,6 +126,53 @@ CCacheManager::setCacheState (FileId fileId, CacheState state)
         return;
 
     m_cache [idx].second.state = state;
+}
+
+void
+CCacheManager::setFileData (FileId fileId, int blockId)
+{
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
+        return;
+
+    it->second.setBlock (blockId);
+}
+
+bool
+CCacheManager::getFileData (FileId fileId, int blockId)
+{
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
+        return false;
+
+    return it->second.hasBlock (blockId);
+}
+
+bool
+CCacheManager::isValidFile (FileId fileId)
+{
+    auto it = m_pStore->find (fileId);
+    return (it != m_pStore->end ());
+}
+
+bool
+CCacheManager::isValidBlock (FileId fileId, int blockId)
+{
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
+        return false;
+
+    return (it->second.blocks() > blockId);
+}
+
+int
+CCacheManager::getNumBlocks (FileId fileId)
+{
+    auto it = m_pStore->find (fileId);
+    if (it == m_pStore->end ())
+        return -1;
+
+    return it->second.blocks();
 }
 
 int

@@ -22,6 +22,7 @@
 #include "../abstraction/INode.h"
 #include "../abstraction/CFileSource.h"
 #include "../transfer/CFileStore.h"
+#include "../abstraction/CCacheManager.h"
 
 using namespace omnetpp;
 
@@ -44,7 +45,8 @@ protected:
 private:
     CFileStore m_cache;
 
-    std::unique_ptr <CFileSource> m_pFileSource;
+    std::unique_ptr <CCacheManager> m_pCacheManager;
+    std::unique_ptr <CFileSource>   m_pFileSource;
 };
 
 #endif

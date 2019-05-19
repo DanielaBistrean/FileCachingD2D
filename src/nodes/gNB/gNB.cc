@@ -23,7 +23,8 @@ void gNB::initialize()
 {
     NetworkAbstraction::getInstance ().registerBase (this);
 
-    m_pFileSource = std::unique_ptr <CFileSource> (new CFileSource (this, &m_cache));
+    m_pCacheManager = std::unique_ptr <CCacheManager> (new CCacheManager (this, &m_cache));
+    m_pFileSource   = std::unique_ptr <CFileSource>   (new CFileSource   (this, m_pCacheManager.get ()));
 }
 
 void gNB::handleMessage(cMessage *msg)

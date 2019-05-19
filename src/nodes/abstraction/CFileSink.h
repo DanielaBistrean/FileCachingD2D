@@ -1,18 +1,20 @@
 #ifndef D2D_CFILESINK_H
 #define D2D_CFILESINK_H 1
 
-#include "../messages/DataPacket_m.h"
+#include <omnetpp.h>
 
 #include "INode.h"
 #include "IProcessor.h"
+#include "CCacheManager.h"
 
-#include <omnetpp.h>
-#include "../transfer/CFileStore.h"
+#include "../messages/DataPacket_m.h"
+
+class CCacheManager;
 
 class CFileSink : public IProcessor
 {
 public:
-    CFileSink (INode * pNode, CFileStore * pCache);
+    CFileSink (INode * pNode, CCacheManager * pCache);
 
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
@@ -32,7 +34,7 @@ private:
 
 private:
     INode * m_pNode;
-    CFileStore * m_pStore;
+    CCacheManager * m_pCache;
 
     bool m_bDownloading;
 };

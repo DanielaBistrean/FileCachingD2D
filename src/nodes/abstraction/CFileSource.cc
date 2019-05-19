@@ -2,9 +2,9 @@
 
 #include "NetworkAbstraction.h"
 
-CFileSource::CFileSource (INode * pNode, CFileStore * pCache)
+CFileSource::CFileSource (INode * pNode, CCacheManager * pCache)
 : m_pNode  {pNode}
-, m_pStore {pCache}
+, m_pCache {pCache}
 {}
 
 void
@@ -50,8 +50,7 @@ CFileSource::do_processRequest (DataPacket * pDataPacket)
     int fileId = pRequest->getFileId ();
     int startBlockId = pRequest->getStartBlockId ();
 
-    auto it = m_pStore->find (fileId);
-    if (it == m_pStore->end () || (! it->second.hasBlock (startBlockId)))
+    if (! m_pCache->getFileData (fileId, startBlockId))
         do_respondWithError(fileId, sId, DP_ERR_NOTFOUND);
     else
         do_respondWithData (fileId, sId, startBlockId);
@@ -77,17 +76,14 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
     bool ack = pFeedback->getAck ();
     int nextBlockId = pFeedback->getNextBlockId ();
 
-    auto it = m_pStore->find (fileId);
-    if (it == m_pStore->end ())
+    if (! m_pCache->isValidFile (fileId))
         return;
-
-    CFile file = it->second;
 
     bool bInRange = NetworkAbstraction::getInstance ().isGateInRange(m_pNode->getNode ()->getId (), sId);
 
-    if (! file.hasBlock (blockId))
+    if (! m_pCache->getFileData(fileId, blockId))
         do_respondWithError(fileId, sId, DP_ERR_NOTFOUND);
-    else if (ack && (nextBlockId == -1 && (file.blocks() == (blockId + 1))))
+    else if (ack && (nextBlockId == -1 && (m_pCache->getNumBlocks (fileId) == (blockId + 1))))
         do_respondWithEOF (fileId, sId);
     else if (bInRange)
     {

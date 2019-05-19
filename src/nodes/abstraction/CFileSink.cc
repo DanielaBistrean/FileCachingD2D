@@ -2,9 +2,9 @@
 
 #include "NetworkAbstraction.h"
 
-CFileSink::CFileSink (INode * pNode, CFileStore * pCache)
+CFileSink::CFileSink (INode * pNode, CCacheManager * pCache)
 : m_pNode  {pNode}
-, m_pStore {pCache}
+, m_pCache {pCache}
 , m_bDownloading {false}
 {}
 
@@ -70,22 +70,19 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
     int blockId = pData->getBlockId ();
 
     // TODO: handle errors
-    auto it = m_pStore->find (fileId);
-    if (it == m_pStore->end ())
+    if (! m_pCache->isValidFile (fileId))
     {
         EV_WARN << "File not found!" << std::endl;
         return;
     }
 
-    CFile file = it->second;
-
-    if (file.blocks () <= blockId)
+    if (! m_pCache->isValidBlock (fileId, blockId))
     {
-        EV_WARN << "Block " << blockId << " outside of file range (" << file.blocks () << ")" << std::endl;
+        EV_WARN << "Block " << blockId << " outside of file range " << std::endl;
         return;
     }
 
-    file.setBlock (blockId);
+    m_pCache->setFileData(fileId, blockId);
 
     do_sendFileFeedback(fileId, sId, blockId, true, -1);
 }

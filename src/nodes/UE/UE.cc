@@ -24,9 +24,9 @@ void UE::initialize()
     NetworkAbstraction::getInstance ().registerUser (this);
 
     m_pMobility       = std::unique_ptr <CMobility>       (new CMobility       (this));
-    m_pFileSink       = std::unique_ptr <CFileSink>       (new CFileSink       (this, &m_cache));
-    m_pFileSource     = std::unique_ptr <CFileSource>     (new CFileSource     (this, &m_cache));
-    m_pCacheManager   = std::unique_ptr <CCacheManager>   (new CCacheManager   (this, m_pFileSink.get (), &m_cache));
+    m_pCacheManager   = std::unique_ptr <CCacheManager>   (new CCacheManager   (this, &m_cache));
+    m_pFileSink       = std::unique_ptr <CFileSink>       (new CFileSink       (this, m_pCacheManager.get ()));
+    m_pFileSource     = std::unique_ptr <CFileSource>     (new CFileSource     (this, m_pCacheManager.get ()));
     m_pNetworkManager = std::unique_ptr <CNetworkManager> (new CNetworkManager (this, m_pFileSink.get (), m_pCacheManager.get ()));
     m_pMainLoop       = std::unique_ptr <CMainLoop>       (new CMainLoop       (this, m_pCacheManager.get (), m_pNetworkManager.get ()));
 

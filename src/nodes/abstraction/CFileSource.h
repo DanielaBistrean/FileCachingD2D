@@ -5,14 +5,14 @@
 
 #include "INode.h"
 #include "IProcessor.h"
+#include "CCacheManager.h"
 
 #include <omnetpp.h>
-#include "../transfer/CFileStore.h"
 
 class CFileSource : public IProcessor
 {
 public:
-    CFileSource (INode * pNode, CFileStore * pCache);
+    CFileSource (INode * pNode, CCacheManager * pCache);
 
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
@@ -27,7 +27,7 @@ private:
 
 private:
     INode * m_pNode;
-    CFileStore * m_pStore;
+    CCacheManager * m_pCache;
 };
 
 #endif // D2D_CFILESOURCE_H

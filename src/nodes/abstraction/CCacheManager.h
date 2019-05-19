@@ -25,8 +25,6 @@
 #include "INode.h"
 #include "IProcessor.h"
 
-#include "CFileSink.h"
-
 struct FileInfo
 {
     std::size_t bytes;
@@ -62,7 +60,7 @@ bool operator== (const CacheEntry &lhs, const CacheEntry &rhs);
 class CCacheManager : public IProcessor
 {
 public:
-    CCacheManager(INode * pNode, CFileSink * pFileSink, CFileStore * pStore);
+    CCacheManager(INode * pNode, CFileStore * pStore);
 
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
@@ -70,6 +68,13 @@ public:
 public:
     bool selectFileForDownload (FileId &fileId);
     bool getFileInfo (FileId fileId, FileInfo &fileInfo);
+
+    void setFileData  (FileId fileId, int blockId);
+    bool getFileData  (FileId fileId, int blockId);
+    bool isValidFile  (FileId fileId);
+    bool isValidBlock (FileId fileId, int blockId);
+
+    int  getNumBlocks (FileId fileId);
 
     CacheState getCacheState (FileId fileId);
     void setCacheState (FileId fileId, CacheState state);
@@ -84,7 +89,6 @@ private:
 
 private:
     INode * m_pNode;
-    CFileSink * m_pFileSink;
     CFileStore * m_pStore;
 
     std::vector <CacheEntry> m_cache;
