@@ -15,7 +15,6 @@
 
 #include "CCacheManager.h"
 
-#include "../messages/ControlPacket_m.h"
 #include "../messages/UENotification_m.h"
 #include "../../configuration/CGlobalConfiguration.h"
 

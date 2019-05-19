@@ -63,11 +63,11 @@ CFileSink::do_processData  (DataPacket * pDataPacket)
 
     EV << "Processing payload from node " << sId << std::endl;
 
-    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    std::unique_ptr <cPacket> pPacket = std::unique_ptr <cPacket> (pDataPacket->decapsulate ());
     if (! pPacket)
         return;
 
-    FileDataPacket * pData = dynamic_cast <FileDataPacket *> (pPacket);
+    FileDataPacket * pData = dynamic_cast <FileDataPacket *> (pPacket.get ());
 
     if (! pData)
         return;
@@ -137,11 +137,11 @@ CFileSink::do_sendFileFeedback (FileId fileId, int destId, int blockId, bool ack
 void
 CFileSink::do_processEOF (DataPacket * pDataPacket)
 {
-    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    std::unique_ptr <cPacket> pPacket = std::unique_ptr <cPacket> (pDataPacket->decapsulate ());
     if (! pPacket)
         return;
 
-    EOFDataPacket * pEOF = dynamic_cast <EOFDataPacket *> (pPacket);
+    EOFDataPacket * pEOF = dynamic_cast <EOFDataPacket *> (pPacket.get ());
 
     if (! pEOF)
         return;
@@ -153,11 +153,11 @@ CFileSink::do_processEOF (DataPacket * pDataPacket)
 void
 CFileSink::do_processError (DataPacket * pDataPacket)
 {
-    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    std::unique_ptr <cPacket> pPacket = std::unique_ptr <cPacket> (pDataPacket->decapsulate ());
     if (! pPacket)
         return;
 
-    ErrorDataPacket * pError = dynamic_cast <ErrorDataPacket*> (pPacket);
+    ErrorDataPacket * pError = dynamic_cast <ErrorDataPacket*> (pPacket.get ());
 
     if (! pError)
         return;

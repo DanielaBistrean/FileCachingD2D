@@ -19,6 +19,7 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <memory>
 
 #include "INode.h"
 #include "IProcessor.h"
@@ -26,6 +27,10 @@
 #include "../messages/ControlPacket_m.h"
 #include "../abstraction/CCacheManager.h"
 #include "../abstraction/CFileSink.h"
+
+#include <omnetpp.h>
+
+using namespace omnetpp;
 
 class CNetworkManager : public IProcessor
 {

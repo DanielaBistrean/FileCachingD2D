@@ -87,7 +87,7 @@ CNetworkManager::do_processConfirmation (ControlPacket * pControlPacket)
     auto sId = pControlPacket->getSourceId ();
     auto dId = pControlPacket->getDestinationId ();
 
-    omnetpp::cPacket * pPacket = pControlPacket->decapsulate ();
+    std::unique_ptr <cPacket> pPacket = std::unique_ptr <cPacket> (pControlPacket->decapsulate ());
 
     if (! pPacket)
     {
@@ -95,7 +95,7 @@ CNetworkManager::do_processConfirmation (ControlPacket * pControlPacket)
         return;
     }
 
-    ConfirmationControlPacket * pConfirmation = dynamic_cast <ConfirmationControlPacket *> (pPacket);
+    ConfirmationControlPacket * pConfirmation = dynamic_cast <ConfirmationControlPacket *> (pPacket.get ());
 
     if (! pConfirmation)
     {
@@ -131,7 +131,7 @@ CNetworkManager::do_processBroadcast (ControlPacket * pControlPacket)
     auto sId = pControlPacket->getSourceId ();
     auto dId = pControlPacket->getDestinationId ();
 
-    omnetpp::cPacket * pPacket = pControlPacket->decapsulate ();
+    std::unique_ptr <cPacket> pPacket = std::unique_ptr <cPacket> (pControlPacket->decapsulate ());
 
     if (! pPacket)
     {
@@ -139,7 +139,7 @@ CNetworkManager::do_processBroadcast (ControlPacket * pControlPacket)
         return;
     }
 
-    BroadcastControlPacket * pBroadcast = dynamic_cast <BroadcastControlPacket *> (pPacket);
+    BroadcastControlPacket * pBroadcast = dynamic_cast <BroadcastControlPacket *> (pPacket.get ());
 
     if (! pBroadcast)
     {

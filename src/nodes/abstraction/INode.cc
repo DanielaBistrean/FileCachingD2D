@@ -22,4 +22,6 @@ void INode::sendBroadcast (omnetpp::cMessage * pMsg)
         cMessage *tmp = pMsg->dup ();
         getNode ()->sendDirect (tmp, 0.005, 0.0025, gate);
     }
+
+    delete pMsg;
 }

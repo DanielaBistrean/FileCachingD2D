@@ -38,11 +38,11 @@ CFileSource::do_processRequest (DataPacket * pDataPacket)
 
     EV_WARN << "Processing data packet from node " << sId << std::endl;
 
-    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    std::unique_ptr <cPacket> pPacket = std::unique_ptr <cPacket> (pDataPacket->decapsulate ());
     if (! pPacket)
         return;
 
-    RequestDataPacket * pRequest = dynamic_cast <RequestDataPacket *> (pPacket);
+    RequestDataPacket * pRequest = dynamic_cast <RequestDataPacket *> (pPacket.get ());
 
     if (! pRequest)
         return;
@@ -62,11 +62,11 @@ CFileSource::do_processFeedback (DataPacket * pDataPacket)
     auto sId = pDataPacket->getSourceId ();
     auto dId = pDataPacket->getDestinationId ();
 
-    omnetpp::cPacket * pPacket = pDataPacket->decapsulate ();
+    std::unique_ptr <cPacket> pPacket = std::unique_ptr <cPacket> (pDataPacket->decapsulate ());
     if (! pPacket)
         return;
 
-    FeedbackDataPacket * pFeedback = dynamic_cast <FeedbackDataPacket *> (pPacket);
+    FeedbackDataPacket * pFeedback = dynamic_cast <FeedbackDataPacket *> (pPacket.get ());
 
     if (! pFeedback)
         return;
