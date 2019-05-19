@@ -23,22 +23,7 @@ CCacheManager::CCacheManager(INode * pNode, CFileSink * pFileSink, CFileCache * 
 : m_pNode {pNode}
 , m_pFileSink {pFileSink}
 , m_pCache {pCache}
-{
-    if (m_pNode->getNode ()->getId () == 2)
-        do_scheduleNextEnquiry ();
-}
-
-bool
-operator< (const CCacheManager::ConfirmationData &lhs, const CCacheManager::ConfirmationData &rhs)
-{
-    return (lhs.quality * lhs.availableBlocks) < (rhs.quality * rhs.availableBlocks);
-}
-
-bool
-operator== (const CCacheManager::ConfirmationData &lhs, const CCacheManager::ConfirmationData &rhs)
-{
-    return (lhs.quality * lhs.availableBlocks) == (rhs.quality * rhs.availableBlocks);
-}
+{}
 
 void
 CCacheManager::process (omnetpp::cMessage * pMsg)
@@ -47,23 +32,6 @@ CCacheManager::process (omnetpp::cMessage * pMsg)
     {
         do_processSelfMessages (pMsg);
         return;
-    }
-
-    ControlPacket *pControlPacket = dynamic_cast <ControlPacket *> (pMsg);
-
-    if (! pControlPacket)
-        return;
-
-    switch (pControlPacket->getType())
-    {
-    case CP_CONFIRM:
-        do_processConfirmation (pControlPacket);
-        break;
-    case CP_BROADCAST:
-        do_processBroadcast (pControlPacket);
-        break;
-    default:
-        break;
     }
 }
 
@@ -84,55 +52,18 @@ CCacheManager::do_processSelfMessages (omnetpp::cMessage * pSelfMessage)
 
     switch (pNotification->getType ())
     {
-    case N_SCHEDULE:
-        do_prepareEnquiry ();
-        break;
-    case N_TIMEOUT:
-        do_processTimeout (fileId);
-        break;
     default:
         break;
     }
 }
 
-void
-CCacheManager::do_processTimeout (FileId fileId)
-{
-    EV_STATICCONTEXT
-
-    auto it = m_enquires.find (fileId);
-    if (it == m_enquires.end ())
-    {
-        EV_WARN << "Invalid file id. Not really interested in that file. Ignoring..." << std::endl;
-        return;
-    }
-
-    auto queue = it->second;
-    m_pCache->setCacheState(fileId, DOWNLOADING);
-
-    if (queue.empty ())
-    {
-        m_pFileSink->requestFile (fileId);
-    }
-    else
-    {
-        ConfirmationData winner = queue.top ();
-        m_pFileSink->requestFile (fileId, winner.nodeId);
-    }
-
-    m_enquires.erase (fileId);
-}
-
-void
-CCacheManager::do_prepareEnquiry ()
+bool
+CCacheManager::selectFileForDownload (FileId &fileId)
 {
     EV_STATICCONTEXT
 
     if (m_pFileSink->isDownloading ())
-    {
-        do_scheduleNextEnquiry ();
-        return;
-    }
+        return false;
 
     omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
 
@@ -141,55 +72,13 @@ CCacheManager::do_prepareEnquiry ()
         if (entry.second.state == NOTPRESENT) candidates.push_back (entry.first);
 
     if (candidates.empty ())
-        return;
+        return false;
 
     std::size_t winner = random->intRand (candidates.size ());
-    FileId fileId = candidates [winner];
+    fileId = candidates [winner];
 
-    m_pCache->setCacheState (fileId, ENQUIRY);
-    m_enquires [fileId] = {};
-
-    ControlPacket * pResponse = new ControlPacket ();
-    pResponse->setSourceId (m_pNode->getNode ()->getId ());
-    pResponse->setDestinationId (-1);
-    pResponse->setType (CP_BROADCAST);
-
-    BroadcastControlPacket * pBroadcast = new BroadcastControlPacket ();
-    pBroadcast->setFileId (fileId);
-    pBroadcast->setStartBlockId (0); // TODO: check first missing block
-
-    pResponse->encapsulate (pBroadcast);
-
-    m_pNode->sendBroadcast(pResponse);
-
-    EV << "Sending broadcast for file " << fileId << std::endl;
-
-    do_scheduleTimeout (fileId);
-    do_scheduleNextEnquiry ();
-}
-
-void
-CCacheManager::do_scheduleNextEnquiry ()
-{
-    UENotification * pNotification = new UENotification ();
-    pNotification->setType (N_SCHEDULE);
-
-    omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
-
-    // New schedule can be in interval [10, 20).
-    m_pNode->sendInternal (pNotification, 10 + (random->doubleRand () * 10));
-}
-
-void
-CCacheManager::do_scheduleTimeout (FileId fileId)
-{
-    static double timeout = CGlobalConfiguration::getInstance ().get ("D2DEnquiryTimeout");
-
-    UENotification * pNotification = new UENotification ();
-    pNotification->setType (N_TIMEOUT);
-    pNotification->setFileId (fileId);
-
-    m_pNode->sendInternal (pNotification, timeout);
+    setCacheState (fileId, ENQUIRY);
+    return true;
 }
 
 void
@@ -198,91 +87,41 @@ CCacheManager::do_recalculatePriorities ()
     m_pCache->recalculatePriorities ();
 }
 
-void
-CCacheManager::do_processConfirmation (ControlPacket * pControlPacket)
+bool
+CCacheManager::getFileInfo (FileId fileId, FileInfo &fileInfo)
 {
-    EV_STATICCONTEXT
+    FileInfo info;
 
-    auto sId = pControlPacket->getSourceId ();
-    auto dId = pControlPacket->getDestinationId ();
+    auto it = m_pCache->find (fileId);
+    if (it == m_pCache->end ())
+        return false;
 
-    omnetpp::cPacket * pPacket = pControlPacket->decapsulate ();
+    for (std::size_t i = 0; i < it->second.file.blocks (); ++i)
+        if (it->second.file.hasBlock (i)) info.availableBlocks.push_back (i);
 
-    if (! pPacket)
-    {
-        EV_WARN << "Could not decapsulate packet" << std::endl;
-        return;
-    }
+    info.blocks = it->second.file.blocks ();
+    info.bytes = it->second.file.size ();
 
-    ConfirmationControlPacket * pConfirmation = dynamic_cast <ConfirmationControlPacket *> (pPacket);
+    fileInfo = info;
+    return true;
+}
 
-    if (! pConfirmation)
-    {
-        EV_WARN << "Not a confirmation packet. Something bad happened." << std::endl;
-        return;
-    }
+CacheState
+CCacheManager::getCacheState (FileId fileId)
+{
+    auto it = m_pCache->find (fileId);
+    if (it == m_pCache->end ())
+        return ERROR;
 
-    FileId fileId = pConfirmation->getFileId ();
-    std::size_t blockId = pConfirmation->getStartBlockId ();
-    std::size_t numBlocks = pConfirmation->getNumBlocks ();
-
-    auto it = m_enquires.find (fileId);
-    if (it == m_enquires.end ())
-    {
-        EV_WARN << "Did not request a discovery/query on the file. Ignoring..." << std::endl;
-        return;
-    }
-
-    ConfirmationData confirmation;
-    confirmation.nodeId = sId;
-    confirmation.quality = 1;
-    confirmation.availableBlocks = numBlocks;
-
-    it->second.push (confirmation);
-    EV << "Saved confirmation from node " << sId << "for analysis" << std::endl;
+    return it->second.state;
 }
 
 void
-CCacheManager::do_processBroadcast (ControlPacket * pControlPacket)
+CCacheManager::setCacheState (FileId fileId, CacheState state)
 {
-    EV_STATICCONTEXT
-
-    auto sId = pControlPacket->getSourceId ();
-    auto dId = pControlPacket->getDestinationId ();
-
-    omnetpp::cPacket * pPacket = pControlPacket->decapsulate ();
-
-    if (! pPacket)
-    {
-        EV_WARN << "Could not decapsulate packet" << std::endl;
-        return;
-    }
-
-    BroadcastControlPacket * pBroadcast = dynamic_cast <BroadcastControlPacket *> (pPacket);
-
-    if (! pBroadcast)
-    {
-        EV_WARN << "Not a broadcast packet. Something bad happened" << std::endl;
-        return;
-    }
-
-    FileId fileId = pBroadcast->getFileId ();
-    int startBlockId = pBroadcast->getStartBlockId ();
-
-    int available = m_pCache->getAvailability (fileId, startBlockId);
-    if (available <= 0)
+    auto it = m_pCache->find (fileId);
+    if (it == m_pCache->end ())
         return;
 
-    ControlPacket * pResponse = new ControlPacket ();
-    pResponse->setSourceId (m_pNode->getNode ()->getId ());
-    pResponse->setDestinationId (sId);
-    pResponse->setType (CP_CONFIRM);
-
-    ConfirmationControlPacket * pConfirmation = new ConfirmationControlPacket ();
-    pConfirmation->setFileId (fileId);
-    pConfirmation->setStartBlockId (startBlockId);
-    pConfirmation->setNumBlocks (available);
-
-    pResponse->encapsulate (pConfirmation);
-    m_pNode->sendOut (pResponse, sId);
+    it->second.state = state;
 }

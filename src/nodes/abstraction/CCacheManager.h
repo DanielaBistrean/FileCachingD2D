@@ -28,6 +28,13 @@
 
 #include "CFileSink.h"
 
+struct FileInfo
+{
+    std::size_t bytes;
+    std::size_t blocks;
+    std::vector <std::size_t> availableBlocks;
+};
+
 class CCacheManager : public IProcessor
 {
 public:
@@ -36,30 +43,17 @@ public:
 public:
     virtual void process (omnetpp::cMessage * pMsg) override;
 
+public:
+    bool selectFileForDownload (FileId &fileId);
+    bool getFileInfo (FileId fileId, FileInfo &fileInfo);
+
+    CacheState getCacheState (FileId fileId);
+    void setCacheState (FileId fileId, CacheState state);
+
 private:
-    void do_processConfirmation (ControlPacket * pDataPacket);
-    void do_processBroadcast    (ControlPacket * pDataPacket);
     void do_processSelfMessages (omnetpp::cMessage * pSelfMessage);
 
-    void do_processTimeout (FileId fileId);
-    void do_processRequest (FileId fileId);
-
-    void do_prepareEnquiry ();
-
-    void do_scheduleNextEnquiry ();
-    void do_scheduleTimeout (FileId fileId);
-
 private:
-    struct ConfirmationData
-    {
-        int nodeId;
-        double quality;
-        int availableBlocks;
-    };
-
-    friend bool operator<  (const ConfirmationData &lhs, const ConfirmationData &rhs);
-    friend bool operator== (const ConfirmationData &lhs, const ConfirmationData &rhs);
-
     void do_recalculatePriorities ();
 
 private:
@@ -67,7 +61,6 @@ private:
     CFileSink * m_pFileSink;
 
     CFileCache * m_pCache;
-    std::map <FileId, std::priority_queue <ConfirmationData> > m_enquires;
 };
 
 #endif /* NODES_ABSTRACTION_CCACHEMANAGER_H_ */

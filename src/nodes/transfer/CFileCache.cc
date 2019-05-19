@@ -12,40 +12,10 @@ CFileCache::CFileCache (bool available)
     }
 }
 
-CacheState
-CFileCache::getCacheState (FileId fileId)
-{
-    auto it = find (fileId);
-    if (it == end ())
-        return ERROR;
-
-    return it->second.state;
-}
-
-void
-CFileCache::setCacheState (FileId fileId, CacheState state)
-{
-    auto it = find (fileId);
-    if (it == end ())
-        return;
-
-    it->second.state = state;
-}
-
 void
 CFileCache::recalculatePriorities ()
 {
 //    std::sort(begin(), end());
-}
-
-int
-CFileCache::getAvailability (FileId fileId, int blockId)
-{
-    auto it = find (fileId);
-    if ((it == end ()) || (blockId >= it->second.file.blocks ()) || (! it->second.file.hasBlock (blockId)))
-        return -1;
-
-    return it->second.file.available ();
 }
 
 bool

@@ -32,11 +32,13 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 # Object files for local .cc, .msg and .sm files
 OBJS = \
     $O/configuration/CGlobalConfiguration.o \
+    $O/nodes/UE/CMainLoop.o \
     $O/nodes/UE/CMobility.o \
     $O/nodes/UE/UE.o \
     $O/nodes/abstraction/CCacheManager.o \
     $O/nodes/abstraction/CFileSink.o \
     $O/nodes/abstraction/CFileSource.o \
+    $O/nodes/abstraction/CNetworkManager.o \
     $O/nodes/abstraction/INode.o \
     $O/nodes/abstraction/NetworkAbstraction.o \
     $O/nodes/gNB/gNB.o \

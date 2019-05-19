@@ -27,8 +27,10 @@
 #include "../abstraction/CFileSink.h"
 #include "../abstraction/CFileSource.h"
 #include "../abstraction/CCacheManager.h"
+#include "../abstraction/CNetworkManager.h"
 
 #include "CMobility.h"
+#include "CMainLoop.h"
 
 using namespace omnetpp;
 
@@ -49,10 +51,12 @@ protected:
 private:
     CFileCache m_cache;
 
-    std::unique_ptr <CMobility>     m_pMobility;
-    std::unique_ptr <CFileSink>     m_pFileSink;
-    std::unique_ptr <CFileSource>   m_pFileSource;
-    std::unique_ptr <CCacheManager> m_pCacheManager;
+    std::unique_ptr <CMainLoop>       m_pMainLoop;
+    std::unique_ptr <CMobility>       m_pMobility;
+    std::unique_ptr <CFileSink>       m_pFileSink;
+    std::unique_ptr <CFileSource>     m_pFileSource;
+    std::unique_ptr <CCacheManager>   m_pCacheManager;
+    std::unique_ptr <CNetworkManager> m_pNetworkManager;
 };
 
 #endif
