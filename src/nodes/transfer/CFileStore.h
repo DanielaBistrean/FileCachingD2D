@@ -9,7 +9,7 @@ using FileId = std::size_t;
 class CFileStore : public std::unordered_map <FileId, CFile>
 {
 public:
-    CFileStore (bool available = false);
+    CFileStore (std::size_t fileSize, bool available = false);
 
     void removeFile (FileId fileId);
 };

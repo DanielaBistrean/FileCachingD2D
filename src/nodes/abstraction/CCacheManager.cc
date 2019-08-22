@@ -63,7 +63,7 @@ CCacheManager::do_computeCache ()
     do_recalculatePriorities ();
 
     static double cacheLimit = CGlobalConfiguration::getInstance ().get ("cacheLimit");
-    std::size_t limit = m_cache.size () * cacheLimit;
+    std::size_t limit = m_cache.size () * (1 - cacheLimit);
 
     EV << "----------------------------------------------------------------------\n";
     EV << '\n';

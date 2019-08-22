@@ -48,7 +48,7 @@ protected:
     virtual void finish();
 
 private:
-    CFileStore m_cache;
+    std::unique_ptr <CFileStore>      m_pCache;
 
     std::unique_ptr <CMainLoop>       m_pMainLoop;
     std::unique_ptr <CMobility>       m_pMobility;
@@ -56,6 +56,9 @@ private:
     std::unique_ptr <CFileSource>     m_pFileSource;
     std::unique_ptr <CCacheManager>   m_pCacheManager;
     std::unique_ptr <CNetworkManager> m_pNetworkManager;
+
+public:
+    omnetpp::simsignal_t m_sigVelocity;
 };
 
 #endif

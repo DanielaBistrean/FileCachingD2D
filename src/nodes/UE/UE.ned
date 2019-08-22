@@ -19,6 +19,9 @@ simple UE
 {
     parameters:
         @display("i=device/cellphone");
+        
+        @signal[velocity](type=double);
+		@statistic[velocity](record = vector, mean);
 
     gates:
         inout radioIn @directIn;

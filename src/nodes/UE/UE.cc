@@ -18,13 +18,19 @@
 Define_Module(UE);
 
 #include "../abstraction/NetworkAbstraction.h"
+#include "../../configuration/CGlobalConfiguration.h"
 
 void UE::initialize()
 {
+    m_sigVelocity = registerSignal("velocity");
+
     NetworkAbstraction::getInstance ().registerUser (this);
+    CGlobalConfiguration &config = CGlobalConfiguration::getInstance ();
+
+    m_pCache = std::unique_ptr <CFileStore> (new CFileStore (config.get("fileSize")));
 
     m_pMobility       = std::unique_ptr <CMobility>       (new CMobility       (this));
-    m_pCacheManager   = std::unique_ptr <CCacheManager>   (new CCacheManager   (this, &m_cache));
+    m_pCacheManager   = std::unique_ptr <CCacheManager>   (new CCacheManager   (this, m_pCache.get()));
     m_pFileSink       = std::unique_ptr <CFileSink>       (new CFileSink       (this, m_pCacheManager.get ()));
     m_pFileSource     = std::unique_ptr <CFileSource>     (new CFileSource     (this, m_pCacheManager.get ()));
     m_pNetworkManager = std::unique_ptr <CNetworkManager> (new CNetworkManager (this, m_pFileSink.get (), m_pCacheManager.get ()));

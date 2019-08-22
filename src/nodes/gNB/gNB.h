@@ -32,9 +32,6 @@ using namespace omnetpp;
 class gNB : public cSimpleModule, public INode
 {
 public:
-    gNB () : m_cache (true) {};
-
-public:
     virtual omnetpp::cSimpleModule* getNode () override;
 
 protected:
@@ -43,7 +40,7 @@ protected:
     virtual void finish();
 
 private:
-    CFileStore m_cache;
+    std::unique_ptr <CFileStore>    m_pCache;
 
     std::unique_ptr <CCacheManager> m_pCacheManager;
     std::unique_ptr <CFileSource>   m_pFileSource;

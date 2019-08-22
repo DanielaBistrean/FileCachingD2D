@@ -81,6 +81,6 @@ CMainLoop::do_scheduleNextRecache ()
 
     omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
 
-    // New schedule can be in interval [10, 20).
-    m_pNode->sendInternal (pNotification, 10 + (random->doubleRand () * 10));
+    // New schedule can be in interval [5, 10).
+    m_pNode->sendInternal (pNotification, 5 + (random->doubleRand () * 5));
 }

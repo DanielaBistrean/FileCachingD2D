@@ -1,13 +1,13 @@
 #include "../../configuration/CGlobalConfiguration.h"
 #include "CFileStore.h"
 
-CFileStore::CFileStore (bool available)
+CFileStore::CFileStore (std::size_t fileSize, bool available)
 {
     int numFiles = CGlobalConfiguration::getInstance ().get ("numFiles");
 
     for (std::size_t id = 0; id < numFiles; ++id)
     {
-        insert({id, CFile (16000, available)});
+        insert({id, CFile (fileSize, available)});
     }
 }
 

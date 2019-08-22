@@ -18,12 +18,16 @@
 Define_Module(gNB);
 
 #include "../abstraction/NetworkAbstraction.h"
+#include "../../configuration/CGlobalConfiguration.h"
 
 void gNB::initialize()
 {
     NetworkAbstraction::getInstance ().registerBase (this);
+    CGlobalConfiguration &config = CGlobalConfiguration::getInstance ();
 
-    m_pCacheManager = std::unique_ptr <CCacheManager> (new CCacheManager (this, &m_cache));
+    m_pCache = std::unique_ptr <CFileStore> (new CFileStore (config.get("fileSize"), true));
+
+    m_pCacheManager = std::unique_ptr <CCacheManager> (new CCacheManager (this, m_pCache.get()));
     m_pFileSource   = std::unique_ptr <CFileSource>   (new CFileSource   (this, m_pCacheManager.get ()));
 }
 

@@ -4,6 +4,8 @@
 
 #include "../messages/PositionUpdate_m.h"
 
+#include "UE.h"
+
 CMobility::CMobility (INode * pNode)
 : m_pNode {pNode}
 {
@@ -54,7 +56,7 @@ CMobility::initialize ()
     CGlobalConfiguration &config = CGlobalConfiguration::getInstance ();
 
     double deltaHeadingMax = config.get ("deltaHeadingMax");
-    double velocityMax     = config.get ("velocityMax");
+    double s_velocityMax   = config.get ("velocityMax");
 
     // Dir is an angle, distance is between 1 and radius
     double dir      = random->doubleRand() * 2 * PI;
@@ -65,7 +67,7 @@ CMobility::initialize ()
     m_posX = m_cx + (distance * cos(dir));
     m_posY = m_cy + (distance * sin(dir));
 
-    m_velocity = random->doubleRand() * (velocityMax - 1) + 1;
+    m_velocity = random->doubleRand() * (s_velocityMax - 1) + 1;
     m_heading = headingCenter + random->doubleRand() * (deltaHeadingMax * 2) - deltaHeadingMax;
 
     do_update ();
@@ -74,6 +76,13 @@ CMobility::initialize ()
 void
 CMobility::do_update ()
 {
+    CGlobalConfiguration &config = CGlobalConfiguration::getInstance ();
+    omnetpp::cRNG * random = omnetpp::getSimulation()->getSystemModule()->getRNG(0);
+    double s_velocityMax   = config.get ("velocityMax");
+    m_velocity = random->doubleRand() * (s_velocityMax - 1) + 1;
+
+    m_pNode->getNode()->emit(((UE *) m_pNode->getNode())->m_sigVelocity, m_velocity);
+
     m_posX += m_velocity * cos (m_heading);
     m_posY += m_velocity * sin (m_heading);
 
